@@ -11,7 +11,8 @@ import (
 
 // Interface me interface
 type Interface interface {
-	GetMe(c echo.Context) error
+	TestDB(c echo.Context) error
+	TestRedis(c echo.Context) error
 }
 
 // Handler me handler
@@ -28,10 +29,30 @@ func NewHandler(c *app.Context) Interface {
 }
 
 // GetMe get me
-func (h *Handler) GetMe(c echo.Context) error {
+// func (h *Handler) GetMe(c echo.Context) error {
+// cc := c.(*context.Context)
+// claims := utils.GetJWTClaims(c)
+// u, err := h.ms.TEST(cc)
+// if err != nil {
+// 	return err
+// }
+// return c.JSON(http.StatusOK, u)
+// }
+
+// TestDB test db
+func (h *Handler) TestDB(c echo.Context) error {
 	cc := c.(*context.Context)
-	// claims := utils.GetJWTClaims(c)
-	u, err := h.ms.TEST(cc)
+	u, err := h.ms.TestDB(cc)
+	if err != nil {
+		return err
+	}
+	return c.JSON(http.StatusOK, u)
+}
+
+// TestRedis test redis
+func (h *Handler) TestRedis(c echo.Context) error {
+	cc := c.(*context.Context)
+	u, err := h.ms.TestRedis(cc)
 	if err != nil {
 		return err
 	}

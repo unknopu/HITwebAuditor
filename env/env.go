@@ -29,6 +29,7 @@ type Environment struct {
 	OTPIssuer         string `mapstructure:"OTP_ISSUER"`
 	OTPAccountName    string `mapstructure:"OTP_ACCOUNT_NAME"`
 	OrderTimeout      int64  `mapstructure:"ORDER_TIME_OUT"`
+	RedisOn           bool   `mapstructure:"REDIS_ON"`
 	RedisHost         string `mapstructure:"REDIS_HOST"`
 	RedisPassword     string `mapstructure:"REDIS_PASSWORD"`
 }

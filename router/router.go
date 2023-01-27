@@ -68,7 +68,7 @@ func NewWithOptions(options *Options, context *app.Context) *echo.Echo {
 	router.Logger.SetPrefix("BOOTS")
 	// healthCheckHandler := healthcheck.NewHandler()
 	// router.GET("/health", healthCheckHandler.HealthCheck)
-	jwtMiddleware := myMiddleware.Cookie(options.Environment.JWTSecret, true)
+	// jwtMiddleware := myMiddleware.Cookie(options.Environment.JWTSecret, true)
 	// jwtNoneRequiredMiddleware := myMiddleware.Cookie(options.Environment.JWTSecret, false)
 	// jwtPartnerMiddleware := middleware.JWT([]byte(options.Environment.PartnerJWTSecret))
 	// userAgentMiddleware := myMiddleware.CheckUserAgent("374", "377")
@@ -100,12 +100,12 @@ func NewWithOptions(options *Options, context *app.Context) *echo.Echo {
 		myMiddleware.WrapResponse(options.Results),
 		myMiddleware.ActivityLog(),
 	)
-	meHandler := me.NewHandler(context)
 
+	meHandler := me.NewHandler(context)
 	meGroup := api.Group("/me")
 	{
-
-		meGroup.GET("", meHandler.GetMe, jwtMiddleware)
+		meGroup.GET("/mongodb", meHandler.TestDB)
+		meGroup.GET("/redis", meHandler.TestRedis)
 	}
 
 	return router

@@ -8,13 +8,6 @@ type Request struct {
 	ProductName string `json:"productName"`
 	ProductID   string `json:"productid"`
 }
-
-type SocailListRequest struct {
-	Type   loginType `json:"type" validate:"required"`
-	Token  string    `json:"token"`
-	Target string    `json:"targaet"`
-}
-
 type (
 	JwtClaims struct {
 		CHash          string `json:"c_hash"`

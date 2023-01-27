@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"log"
 	"reflect"
 	"sync"
 	"time"
@@ -45,8 +46,11 @@ func InitDatabase(o *Options) error {
 
 	uri := fmt.Sprintf("mongodb://%s:%d", o.URL, o.Port)
 	if o.Username != "" && o.Password != "" {
-		uri = fmt.Sprintf("mongodb+srv://%s:%s@%s/%s", o.Username, o.Password, o.URL, o.DatabaseName)
+		uri = fmt.Sprintf("mongodb+srv://%s:%s@%s/%s",
+			o.Username, o.Password, o.URL, o.DatabaseName,
+		)
 	}
+	log.Println(uri)
 
 	clientOptions := options.Client().ApplyURI(uri)
 	client, err := mongo.Connect(ctx, clientOptions)
