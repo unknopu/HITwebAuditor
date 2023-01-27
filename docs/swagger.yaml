@@ -1,0 +1,187 @@
+basePath: /api/v1
+definitions:
+  partner.ApiError:
+    properties:
+      code:
+        description: |-
+          code = 9001 member not found
+          code = 9999 internal server error
+        type: string
+      message:
+        description: |-
+          message = 9001 member not found.
+          message = 9999 internal server error
+        type: string
+    type: object
+  partner.CancelOrderForm:
+    properties:
+      member:
+        type: string
+      message:
+        type: string
+      orderno:
+        type: string
+      title:
+        type: string
+    type: object
+  partner.Member:
+    properties:
+      ecouponcode:
+        type: string
+      membercode:
+        type: string
+    required:
+    - ecouponcode
+    - membercode
+    type: object
+  partner.NotificationForm:
+    properties:
+      data:
+        items:
+          $ref: '#/definitions/partner.Member'
+        type: array
+      expire:
+        type: string
+      message:
+        type: string
+      send_now:
+        type: boolean
+      title:
+        type: string
+      type:
+        description: type = 1 message
+        example: 1
+        type: integer
+    required:
+    - data
+    - expire
+    - message
+    - title
+    - type
+    type: object
+  partner.OrderUpdateForm:
+    properties:
+      createdate:
+        type: string
+      expireddate:
+        type: string
+      member:
+        type: string
+      message:
+        type: string
+      orderno:
+        type: string
+      qrcode:
+        type: string
+      status:
+        type: string
+      title:
+        type: string
+    type: object
+  response.Message:
+    properties:
+      message:
+        example: success
+        type: string
+    type: object
+host: localhost:8000
+info:
+  contact:
+    email: support@swagger.io
+    name: API Support
+    url: http://www.swagger.io/support
+  description: This is a sample server celler server.
+  termsOfService: http://swagger.io/terms/
+  title: Boot Mobile API DOCS
+  version: "1.0"
+paths:
+  /partners/notification:
+    post:
+      consumes:
+      - application/json
+      description: Create Notification
+      parameters:
+      - description: form for create notification
+        in: body
+        name: NotificationForm
+        required: true
+        schema:
+          $ref: '#/definitions/partner.NotificationForm'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.Message'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/partner.ApiError'
+      security:
+      - ApiKeyAuth: []
+      summary: Create Notification
+      tags:
+      - Notification
+  /partners/orders:
+    post:
+      consumes:
+      - application/json
+      description: OrderUpdate order update status
+      parameters:
+      - description: form for order update
+        in: body
+        name: OrderUpdateForm
+        required: true
+        schema:
+          $ref: '#/definitions/partner.OrderUpdateForm'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.Message'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/partner.ApiError'
+      security:
+      - ApiKeyAuth: []
+      summary: OrderUpdate order update status
+      tags:
+      - Orders
+  /partners/orders/cancel:
+    post:
+      consumes:
+      - application/json
+      description: CancelOrderForm cancel order
+      parameters:
+      - description: form for cancel order
+        in: body
+        name: CancelOrderForm
+        required: true
+        schema:
+          $ref: '#/definitions/partner.CancelOrderForm'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.Message'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/partner.ApiError'
+      security:
+      - ApiKeyAuth: []
+      summary: CancelOrderForm cancel order
+      tags:
+      - Orders
+securityDefinitions:
+  ApiKeyAuth:
+    in: header
+    name: Authorization
+    type: apiKey
+swagger: "2.0"

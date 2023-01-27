@@ -1,0 +1,112 @@
+package router
+
+import (
+	"auditor/handlers/errors"
+
+	"github.com/BurntSushi/toml"
+	"github.com/labstack/echo/v4"
+	"github.com/labstack/echo/v4/middleware"
+	"github.com/labstack/gommon/log"
+	"github.com/nicksnyder/go-i18n/v2/i18n"
+	"golang.org/x/text/language"
+	"golang.org/x/time/rate"
+
+	"auditor/app"
+	"auditor/core/validator"
+	"auditor/env"
+	"auditor/handlers/me"
+	middlewareLog "auditor/middleware"
+	myMiddleware "auditor/middleware"
+	"auditor/response"
+)
+
+var (
+	buildstamp string
+	githash    string
+)
+
+// Options option for new router
+type Options struct {
+	LogLevel      log.Lvl
+	LogHeader     string
+	LogMiddleware echo.MiddlewareFunc
+	Environment   *env.Environment
+	Results       *response.Results
+}
+
+func initEcho(m *middlewareLog.Middleware) *echo.Echo {
+	e := echo.New()
+
+	e.Use(m.Build(buildstamp, githash))
+	if true {
+		config := middlewareLog.RateLimiterConfig{
+			Store: m.NewRateLimiterMemoryStore(rate.Limit(20)),
+		}
+		e.Use(m.RateLimiterWithConfig(config))
+	}
+	e.Use(m.LogRequestInfo())
+	e.Use(m.Logger())
+	return e
+}
+
+// New new router
+func New() *echo.Echo {
+	return NewWithOptions(nil, nil)
+}
+
+// NewWithOptions new router with options
+func NewWithOptions(options *Options, context *app.Context) *echo.Echo {
+	bundle := i18n.NewBundle(language.BritishEnglish)
+	bundle.RegisterUnmarshalFunc("toml", toml.Unmarshal)
+	bundle.MustLoadMessageFile("active.th.toml")
+	bundle.MustLoadMessageFile("active.en.toml")
+	m := middlewareLog.New("boot-api")
+	router := initEcho(m)
+	router.Validator = validator.New()
+	router.HTTPErrorHandler = errors.HTTPErrorHandler
+
+	router.Logger.SetPrefix("BOOTS")
+	// healthCheckHandler := healthcheck.NewHandler()
+	// router.GET("/health", healthCheckHandler.HealthCheck)
+	jwtMiddleware := myMiddleware.Cookie(options.Environment.JWTSecret, true)
+	// jwtNoneRequiredMiddleware := myMiddleware.Cookie(options.Environment.JWTSecret, false)
+	// jwtPartnerMiddleware := middleware.JWT([]byte(options.Environment.PartnerJWTSecret))
+	// userAgentMiddleware := myMiddleware.CheckUserAgent("374", "377")
+
+	api := router.Group("/api/:version")
+	api.Use(middleware.CORSWithConfig(middleware.CORSConfig{
+		AllowOrigins: []string{"*"},
+		AllowHeaders: []string{
+			echo.HeaderOrigin,
+			echo.HeaderContentType,
+			echo.HeaderAccept,
+			echo.HeaderAuthorization,
+			"mobile",
+			"session",
+		},
+	}))
+	api.Use(middleware.Recover())
+	api.Use(myMiddleware.CustomContext(bundle))
+	if options != nil {
+		router.Logger.SetLevel(options.LogLevel)
+		if options.LogHeader != "" {
+			router.Logger.SetHeader(options.LogHeader)
+		}
+		api.Use(options.LogMiddleware)
+	}
+	api.Use(
+		middleware.Secure(),
+		middleware.Gzip(),
+		myMiddleware.WrapResponse(options.Results),
+		myMiddleware.ActivityLog(),
+	)
+	meHandler := me.NewHandler(context)
+
+	meGroup := api.Group("/me")
+	{
+
+		meGroup.GET("", meHandler.GetMe, jwtMiddleware)
+	}
+
+	return router
+}

@@ -1,0 +1,8 @@
+apiVersion: v1
+data:
+  .dockerconfigjson: eyJhdXRocyI6eyJ0aG1hcHBia2tyZWdpc3RyeS5henVyZWNyLmlvIjp7InVzZXJuYW1lIjoidGhtYXBwYmtrcmVnaXN0cnkiLCJwYXNzd29yZCI6Imp3VXNOUkIyeXBPdGF2SGlkajRvRHlXK3Z4eVdXUjN3IiwiYXV0aCI6ImRHaHRZWEJ3WW10cmNtVm5hWE4wY25rNmFuZFZjMDVTUWpKNWNFOTBZWFpJYVdScU5HOUVlVmNyZG5oNVYxZFNNM2M9In19fQ==
+kind: Secret
+metadata:
+  name: azure-registry
+  namespace: prod
+type: kubernetes.io/dockerconfigjson
