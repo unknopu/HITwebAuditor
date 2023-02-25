@@ -76,7 +76,7 @@ jobs:
           push: true
           compose-file: "./docker-compose.yml"
           load: false
-          tags: ${{ format('unknopu/{0}v{1}:latest', env.DEPLOYMENT_NAME, ${{github.run_number}}) }}
+          tags: ${{ format('unknopu/{0}v{1}:latest', env.DEPLOYMENT_NAME) }}
           cache-from: type=gha
           cache-to: type=gha,mode=max
           platforms: linux/amd64
