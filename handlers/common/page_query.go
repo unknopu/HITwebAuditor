@@ -10,6 +10,7 @@ var DefaultPageSize = 20
 // PageQuery page form
 type PageQuery struct {
 	Query      string `query:"q"`
+	Type       int    `query:"t"`
 	NextPageID string `query:"next_page_id"`
 	Size       int    `query:"size"`
 }

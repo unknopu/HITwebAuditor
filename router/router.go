@@ -2,6 +2,7 @@ package router
 
 import (
 	"auditor/handlers/errors"
+	"net/http"
 
 	"github.com/BurntSushi/toml"
 	"github.com/labstack/echo/v4"
@@ -15,6 +16,7 @@ import (
 	"auditor/core/validator"
 	"auditor/env"
 	"auditor/handlers/me"
+	"auditor/handlers/sql"
 	middlewareLog "auditor/middleware"
 	myMiddleware "auditor/middleware"
 	"auditor/response"
@@ -101,11 +103,24 @@ func NewWithOptions(options *Options, context *app.Context) *echo.Echo {
 		myMiddleware.ActivityLog(),
 	)
 
+	// API health checker
+	api.GET("/healthcheck", func(c echo.Context) error {
+		return c.String(http.StatusOK, "healthy\n")
+	})
+
 	meHandler := me.NewHandler(context)
+	SQLIHandler := sql.NewHandler(context)
+
 	meGroup := api.Group("/me")
 	{
 		meGroup.GET("/mongodb", meHandler.TestDB)
 		meGroup.GET("/redis", meHandler.TestRedis)
+	}
+
+	SQLiGroup := api.Group("/sqli")
+	{
+		SQLiGroup.GET("/test", SQLIHandler.TestIntruder)
+		SQLiGroup.POST("", SQLIHandler.Init)
 	}
 
 	return router
