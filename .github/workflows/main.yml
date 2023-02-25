@@ -1,0 +1,82 @@
+---
+name: 01 Basic Dcoker Build
+
+env:
+  # GKE_CLUSTER: iconica  
+  # GKE_ZONE: asia-southeast1-a	 
+  DEPLOYMENT_NAME: hit190202102
+  # DEPLOYMENT_NAME: ${{ github.event.repository.name }}
+  SONAR_PROJECT_KEY: testapi
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "develop" ]
+  
+jobs:
+  sonarqube-scan:
+    name: SonarQube to detects code smells
+    runs-on: ubuntu-latest
+    steps:
+
+    - uses: actions/checkout@v3
+      with:
+        fetch-depth: 0
+
+    # - name: SonarQube Scan
+    #   uses: sonarsource/sonarqube-scan-action@master
+    #   env:
+    #     SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+    #     SONAR_HOST_URL: ${{ secrets.SONAR_HOST_URL }}
+  
+  docker-build:
+    name: Docker build and push artifact
+    needs: sonarqube-scan
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout git repo
+        uses: actions/checkout@v3
+
+      - name: Checkov Dockerfile Scan
+        uses: bridgecrewio/checkov-action@v12.1347.0
+        with:
+          directory: .
+          framwork: dockerfile
+
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v1
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v1
+
+      - name: Login to Docker Hub
+        uses: docker/login-action@v2
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+      
+      - name: Docker Metadata for Final Image Build
+        id: docker_meta
+        uses: docker/metadata-action@v3
+        with:
+          images: ${{ format('unknopu/{0}:latest', env.DEPLOYMENT_NAME) }}
+          flavor: |
+            latest=false
+          tags: |
+            type=raw,value=04
+            type=raw,value=latest,eneble=${{ endsWith(github.ref, github.event.repository.name) }}
+            type=ref,event=pr
+            type=ref,event=branch
+            type=semver,pattern={{version}}          
+
+      - name: Docker build & push
+        uses: docker/build-push-action@v2
+        with:
+          push: true
+          compose-file: "./docker-compose.yml"
+          load: false
+          tags: ${{ format('unknopu/{0}:latest', env.DEPLOYMENT_NAME) }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+          platforms: linux/amd64
