@@ -2,14 +2,14 @@ FROM golang:1.16.3-alpine3.13 as builder
 ENV CGO_ENABLED=0
 ENV GOOS=linux
 ENV GOARCH=amd64
+ENV TZ=Asia/Bangkok
 
 RUN apk update && apk upgrade && \
   apk add --no-cache ca-certificates git wget
 
 WORKDIR /api
 ADD . /api
-RUN go mod download
-RUN go build -o api
+RUN go mod download .
 
 FROM alpine:3.13.4
 
