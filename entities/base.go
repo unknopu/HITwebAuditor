@@ -1,11 +1,13 @@
 package entities
 
 import (
+	"auditor/core/mongodb"
 	"auditor/core/utils"
 	"net/url"
 )
 
 type DBOptions struct {
+	mongodb.Model  `bson:",inline"`
 	URL            *url.URL
 	Parameter      string
 	ParameterValue string
@@ -14,11 +16,13 @@ type DBOptions struct {
 	NameLength     int
 	TableCount     int
 	Name           string
-	TablesColumns  map[string][]string
-	TablesRows     map[int][]string
+	Columns        map[string][]string
+	Rows           map[int][]string
+	Cookie         string
+	FromDB         bool `bson:"-"`
 }
 
-func URLOptions(rURL, param string) *DBOptions {
+func URLOptions(rURL, param, cookie string) *DBOptions {
 	webURL, err := url.Parse(rURL)
 	if err != nil {
 		return nil
@@ -29,11 +33,12 @@ func URLOptions(rURL, param string) *DBOptions {
 
 	return &DBOptions{
 		URL:            webURL,
-		PageLength:     utils.GetPageLength(webURL.String()),
-		TablesColumns:  make(map[string][]string),
-		TablesRows:     make(map[int][]string),
+		PageLength:     utils.GetPageLength(webURL.String(), cookie),
+		Columns:        make(map[string][]string),
+		Rows:           make(map[int][]string),
 		Parameter:      p,
 		ParameterValue: pValue,
+		Cookie:         cookie,
 	}
 }
 
@@ -46,4 +51,33 @@ func fetchParam(vs url.Values, param string) (string, string) {
 		key, value = v, vs.Get(v)
 	}
 	return key, value
+}
+
+type ProcType int
+
+const (
+	NameLength ProcType = iota
+	Name
+	TableCount
+	ColumnsName
+	Tables
+)
+
+func (i DBOptions) ValidateProc(proc ProcType) bool {
+	if proc == NameLength {
+		return i.NameLength > 0
+	}
+	if proc == Name {
+		return len(i.Name) > 0
+	}
+	if proc == TableCount {
+		return i.TableCount > 0
+	}
+	if proc == ColumnsName {
+		return len(i.Columns) > 0
+	}
+	if proc == Tables {
+		return i.Columns == nil
+	}
+	return false
 }

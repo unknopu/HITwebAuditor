@@ -1,12 +1,13 @@
 package sql
 
-
 import (
 	"auditor/core/mongodb"
+
+	"go.mongodb.org/mongo-driver/bson/primitive"
 )
 
 const (
-	collectionName = "test"
+	collectionName = "sqli"
 )
 
 // RepoInterface repo interface
@@ -15,6 +16,7 @@ type RepoInterface interface {
 	Update(i interface{}) error
 	Delete(i interface{}) error
 	FindOneByID(id string, i interface{}) error
+	FindOneByPrimitiveM(m primitive.M, i interface{}) error
 }
 
 // Repo otp repo
@@ -31,4 +33,8 @@ func NewRepo() *Repo {
 				Collection(collectionName),
 		},
 	}
+}
+
+func filterURL(url string) primitive.M {
+	return primitive.M{"url": url}
 }
