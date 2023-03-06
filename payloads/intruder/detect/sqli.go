@@ -19,6 +19,7 @@ var NegativePayloads = map[int]string{
 }
 
 var ErrPayloads = []string{
+	"Syntax error or access violation",
 	"Fatal error:",
 	"error in your SQL syntax",
 	"mysql_num_rows()",

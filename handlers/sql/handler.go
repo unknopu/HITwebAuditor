@@ -14,6 +14,7 @@ import (
 type Interface interface {
 	TestIntruder(c echo.Context) error
 	Init(c echo.Context) error
+	UnionBased(c echo.Context) error
 }
 
 // Handler me handler
@@ -50,6 +51,19 @@ func (h *Handler) Init(c echo.Context) error {
 		return err
 	}
 	u, err := h.ms.Init(cc, f)
+	if err != nil {
+		return err
+	}
+	return c.JSON(http.StatusOK, u)
+}
+
+func (h *Handler) UnionBased(c echo.Context) error {
+	cc := c.(*context.Context)
+	f := &BaseForm{}
+	if err := c.(*context.Context).BindAndValidate(f); err != nil {
+		return err
+	}
+	u, err := h.ms.UnionBased(cc, f)
 	if err != nil {
 		return err
 	}

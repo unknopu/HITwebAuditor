@@ -1,0 +1,89 @@
+#!groovy
+pipeline {
+    agent { 
+        node {label 'win10'} 
+    }
+    environment {
+        GIT_REPO = "git@us-south.git.cloud.ibm.com:nimble/kbol/web/kbol-service.git"
+        GIT_BRANCH = "master"
+        ORGANIZATION = "ksn"
+        PROJECT_NAME = "kbol"
+        SCANNER_HOME = tool 'SonarScanner for MSBuild'
+        MSBUILD_HOME = tool 'Default MSBuild'
+        APP_BUILD_PATH = "BAY.KBOL\\BAY.KOL.Corp.WebService\\website.publishproj"
+        APP_OUTPUT_PATH = "C:\\Temp\\Service\\publish"
+        APP_ARCHIVES_PATH = "C:\\Temp\\Archives"
+    }
+    stages {
+        stage('Git checkout') {
+            steps{
+                echo "Pull source code"
+                git (
+                    credentialsId: 'GIT_IBM_11390010',
+                    url: "${GIT_REPO}",
+                    branch : "${GIT_BRANCH}"
+                )
+            }
+        }
+        stage('SonarQube Analysis') {
+            steps{
+                echo "SnarQube Scan"
+                //withSonarQubeEnv('SonarQube_Server_local') {
+                //  bat "\"${SCANNER_HOME}\\SonarScanner.MSBuild.exe\" begin /k:\"kbol\""
+                //  bat "\"${MSBUILD_HOME}\\MSBuild.exe\" BAY.KBOL\\BAY.KOL.Corp.WebService\\website.publishproj /t:Rebuild /p:TargetFramework=net35"
+                //  bat "\"${SCANNER_HOME}\\SonarScanner.MSBuild.exe\" end"
+                //}
+                
+            }
+        }    
+        stage("Build .Net Framework"){
+            steps{
+                echo "${APP_BUILD_PATH}"
+                echo "${APP_OUTPUT_PATH}"
+                
+                //bat "\"${MSBUILD_HOME}\\MSBuild.exe\""
+                script {
+                    def msbuild = "\"${MSBUILD_HOME}\\MSBuild.exe\""
+                    echo "msbuild=${msbuild}"
+                    def exitStatus = bat(returnStatus: true, script: "${msbuild} ${APP_BUILD_PATH} /p:Configuration=Release /p:Platform=AnyCPU /p:VisualStudioVersion=15.0 /p:DeployDefaultTarget=WebPublish /p:WebPublishMethod=FileSystem /p:DeleteExistingFiles=True /p:DeployOnBuild=True /p:publishUrl=${APP_OUTPUT_PATH}")
+                    if (exitStatus != 0){
+                        currentBuild.result = 'FAILURE'
+                    }
+                }
+            }
+        }
+        stage("Dependency-check"){
+            steps{
+                echo "Dependency-check"
+                // Run OWASP Dependency Check
+                //dependencyCheck additionalArguments: ''' 
+                //    -s "${APP_OUTPUT_PATH}"
+                //    -f "ALL" 
+                //    --prettyPrint''', odcInstallation: 'OWASP Dependency-Check'
+            //dependencyCheckPublisher pattern: 'dependency-check-report.xml'
+            //dependencyCheckPublisher failedTotalCritical: 1, failedTotalHigh: 1, failedTotalLow: 10, failedTotalMedium: 5, pattern: '', unstableTotalCritical: 1, unstableTotalHigh: 1, unstableTotalLow: 10, unstableTotalMedium: 5
+            //dependencyCheckPublisher failedTotalCritical: 10, failedTotalHigh: 10, failedTotalLow: 10, failedTotalMedium: 5, pattern: '', unstableTotalCritical: 2, unstableTotalHigh: 1, unstableTotalLow: 10, unstableTotalMedium: 5
+            }
+        }
+        stage("Zip Artifact"){
+            steps{
+                echo "Push Atifact to Nexus"
+                echo "Zip Atifact"
+                powershell "Compress-Archive -Path ${APP_OUTPUT_PATH} -DestinationPath ${APP_ARCHIVES_PATH}\\kbol-service-${currentBuild.number}.zip"
+                echo "Zip Atifact Completed"
+            }
+        }
+        stage("Push Artifact"){
+            steps{
+                echo "Push Artifact"
+                script {
+                    echo "file_path=${APP_ARCHIVES_PATH}\\kbol-service-${currentBuild.number}.zip"
+                    //archiveArtifacts "kbol-service-${currentBuild.number}.zip"
+                    nexusArtifactUploader artifacts: [[artifactId: 'kbol-service', classifier: '', file: "${APP_ARCHIVES_PATH}\\kbol-service-${currentBuild.number}.zip", type: 'zip']], credentialsId: 'nexus-credentials', groupId: 'service', nexusUrl: '192.168.1.111:8081', nexusVersion: 'nexus3', protocol: 'http', repository: 'kbol', version: 'dev-latest'
+                }
+            }
+            
+        }
+    
+    }
+}

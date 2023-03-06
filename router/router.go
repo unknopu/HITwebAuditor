@@ -121,6 +121,7 @@ func NewWithOptions(options *Options, context *app.Context) *echo.Echo {
 	{
 		SQLiGroup.GET("/test", SQLIHandler.TestIntruder)
 		SQLiGroup.POST("", SQLIHandler.Init)
+		SQLiGroup.POST("/union", SQLIHandler.UnionBased)
 	}
 
 	return router

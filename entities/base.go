@@ -15,11 +15,11 @@ type DBOptions struct {
 	Payload        int
 	NameLength     int
 	TableCount     int
+	Tables         map[string][]string
 	Name           string
-	Columns        map[string][]string
 	Rows           map[int][]string
-	Cookie         string
-	FromDB         bool `bson:"-"`
+	Cookie         string `json:"cookie,omitempty"`
+	FromDB         bool   `bson:"-"`
 }
 
 func URLOptions(rURL, param, cookie string) *DBOptions {
@@ -34,7 +34,7 @@ func URLOptions(rURL, param, cookie string) *DBOptions {
 	return &DBOptions{
 		URL:            webURL,
 		PageLength:     utils.GetPageLength(webURL.String(), cookie),
-		Columns:        make(map[string][]string),
+		Tables:         make(map[string][]string),
 		Rows:           make(map[int][]string),
 		Parameter:      p,
 		ParameterValue: pValue,
@@ -68,16 +68,14 @@ func (i DBOptions) ValidateProc(proc ProcType) bool {
 		return i.NameLength > 0
 	}
 	if proc == Name {
-		return len(i.Name) > 0
+		return len(i.Name) == i.NameLength
 	}
 	if proc == TableCount {
 		return i.TableCount > 0
 	}
-	if proc == ColumnsName {
-		return len(i.Columns) > 0
+	if proc == Tables || proc == ColumnsName {
+		return len(i.Tables) == i.TableCount
 	}
-	if proc == Tables {
-		return i.Columns == nil
-	}
+
 	return false
 }
