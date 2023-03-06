@@ -5,12 +5,16 @@ import (
 	"auditor/entities"
 	"fmt"
 	"log"
+	"strings"
+)
+
+const (
+	ErrXPathForm = "XPATH syntax error: '.*'"
+	ErrXPathQueryFrom     = "XPATH syntax error: ':.*'"
 )
 
 func UnionBasedvalidate(options *entities.DBOptions, query string) string {
 	u := *options.URL
-	// q := u.Query()
-	// q.Set(options.Parameter, options.ParameterValue+query)
 	u.RawQuery = fmt.Sprintf("%s=%s", options.Parameter, options.ParameterValue+query)
 
 	log.Println("========================")
@@ -21,4 +25,11 @@ func UnionBasedvalidate(options *entities.DBOptions, query string) string {
 	log.Println("========================")
 
 	return utils.GetPageHTML(u.String(), options.Cookie)
+}
+
+func TrimData(s string) string {
+	s = strings.ReplaceAll(s, "XPATH syntax error: ':", "")
+	s = strings.ReplaceAll(s, "'\nWarning:", "")
+	s = strings.ReplaceAll(s, "'", "")
+	return s
 }

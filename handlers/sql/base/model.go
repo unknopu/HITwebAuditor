@@ -7,5 +7,5 @@ const (
 	LengthValidation
 	ErrorSQLiBased
 	BlindSQLiBased
-	BetweenSQLiBased
+	UnionSQLiBased
 )

@@ -5,6 +5,7 @@ import (
 	based "auditor/handlers/sql/base"
 	"auditor/payloads/intruder/detect"
 	"fmt"
+	"regexp"
 
 	"log"
 	"strconv"
@@ -32,15 +33,21 @@ func generatePwnQuery(query string) string {
 }
 
 func validatePwnType() based.SQLi {
-	if validateByMethod("'", based.LengthValidation) == 0 && validateByMethod("'", based.ErrorSQLiBased) == 0 {
-		return based.BetweenSQLiBased
+	html := based.UnionBasedvalidate(options, "+and+extractvalue(1,'^x')")
+	r := regexp.MustCompile(based.ErrXPathForm)
+	anyXPATH := r.FindString(html)
+	log.Println("XPATH's result: ", anyXPATH)
+	if anyXPATH != "" {
+		return based.UnionSQLiBased
 	}
+
 	if validateByMethod("'", based.LengthValidation) == 0 {
 		return based.LengthValidation
 	}
-	if validateByMethod("'", based.ErrorSQLiBased) == 0 || validateByErrorBased() == 1 {
+	if validateByMethod("'", based.ErrorSQLiBased) == 0 {
 		return based.ErrorSQLiBased
 	}
+
 	return based.UnkownBased
 }
 

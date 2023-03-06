@@ -12,6 +12,7 @@ type DBOptions struct {
 	Parameter      string
 	ParameterValue string
 	PageLength     int
+	PageOrigin     string
 	Payload        int
 	NameLength     int
 	TableCount     int
@@ -33,6 +34,7 @@ func URLOptions(rURL, param, cookie string) *DBOptions {
 
 	return &DBOptions{
 		URL:            webURL,
+		PageOrigin:     utils.GetPageHTML(webURL.String(), cookie),
 		PageLength:     utils.GetPageLength(webURL.String(), cookie),
 		Tables:         make(map[string][]string),
 		Rows:           make(map[int][]string),

