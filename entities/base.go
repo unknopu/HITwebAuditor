@@ -11,16 +11,17 @@ type DBOptions struct {
 	URL            *url.URL
 	Parameter      string
 	ParameterValue string
-	PageLength     int
-	PageOrigin     string
-	Payload        int
-	NameLength     int
+	PageLength     int    `json:"-"`
+	PageOrigin     string `json:"-"`
+	Payload        int    `json:"-"`
+	NameLength     int    `json:"-"`
 	TableCount     int
 	Tables         map[string][]string
 	Name           string
 	Rows           map[int][]string
 	Cookie         string `json:"cookie,omitempty"`
 	FromDB         bool   `bson:"-"`
+	InjectionBase  string
 }
 
 func URLOptions(rURL, param, cookie string) *DBOptions {
