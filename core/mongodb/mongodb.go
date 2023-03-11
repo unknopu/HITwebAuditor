@@ -51,8 +51,8 @@ func InitDatabase(o *Options) error {
 		)
 	}
 	if o.DatabaseName == "" {
-		uri = fmt.Sprintf("mongodb+srv://%s:%s@%s:%d",
-			o.Username, o.Password, o.URL, o.Port,
+		uri = fmt.Sprintf("mongodb+srv://%s:%s@%s",
+			o.Username, o.Password, o.URL,
 		)
 	}
 	log.Println(uri)
