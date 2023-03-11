@@ -50,6 +50,11 @@ func InitDatabase(o *Options) error {
 			o.Username, o.Password, o.URL, o.DatabaseName,
 		)
 	}
+	if o.DatabaseName == "" {
+		uri = fmt.Sprintf("mongodb+srv://%s:%s@%s:%d",
+			o.Username, o.Password, o.URL, o.Port,
+		)
+	}
 	log.Println(uri)
 
 	clientOptions := options.Client().ApplyURI(uri)

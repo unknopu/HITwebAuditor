@@ -65,10 +65,7 @@ func main() {
 
 	entities.BaseURL = envConfig.WebURL
 	databaseURL := envConfig.DatabaseURL
-	if os.Getenv("IS_CLOUD") == "true" {
-		databaseURL = "mongodb"
-	}
-	err = mongodb.InitDatabase(&mongodb.Options{
+	mongodbOptions := &mongodb.Options{
 		URL:          databaseURL,
 		Port:         envConfig.DatabasePort,
 		DatabaseName: envConfig.DatabaseName,
@@ -76,7 +73,12 @@ func main() {
 		Password:     envConfig.DatabasePassword,
 		Root:         envConfig.DatabaseRoot,
 		Debug:        !envConfig.Release,
-	})
+	}
+	if os.Getenv("IS_CLOUD") == "true" {
+		mongodbOptions.URL = "mongodb"
+		mongodbOptions.DatabaseName = ""
+	}
+	err = mongodb.InitDatabase(mongodbOptions)
 	if err != nil {
 		panic(err)
 	}
