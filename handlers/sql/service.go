@@ -131,6 +131,9 @@ func (s *Service) ErrorBased(c *context.Context, f *BaseForm) (interface{}, erro
 	errorBased.ExtractDBName(options)
 	errorBased.ExtractTables(options)
 	errorBased.ExtractColumns(options)
+	if f.QueryTable != "" {
+		errorBased.ExtractRowsByTable(options, f.QueryTable)
+	}
 
 	return options, nil
 }

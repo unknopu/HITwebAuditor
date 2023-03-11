@@ -14,6 +14,7 @@ type DBOptions struct {
 	PageLength     int    `json:"-"`
 	PageOrigin     string `json:"-"`
 	Payload        int    `json:"-"`
+	PayloadStr     string `json:"-"`
 	NameLength     int    `json:"-"`
 	TableCount     int
 	Tables         map[string][]string

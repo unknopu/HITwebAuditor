@@ -64,8 +64,12 @@ func main() {
 	utils.InitSecureCookie(envConfig.CookieHashKey, envConfig.CookieBlockKey)
 
 	entities.BaseURL = envConfig.WebURL
+	databaseURL := envConfig.DatabaseURL
+	if os.Getenv("IS_CLOUD") == "true" {
+		databaseURL = "mongodb"
+	}
 	err = mongodb.InitDatabase(&mongodb.Options{
-		URL:          envConfig.DatabaseURL,
+		URL:          databaseURL,
 		Port:         envConfig.DatabasePort,
 		DatabaseName: envConfig.DatabaseName,
 		Username:     envConfig.DatabaseUsername,
