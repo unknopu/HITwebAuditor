@@ -4,6 +4,10 @@ import (
 	"github.com/golang-jwt/jwt"
 )
 
+type Healthcheck struct {
+	Status string `json:"status"`
+}
+
 type Request struct {
 	ProductName string `json:"productName"`
 	ProductID   string `json:"productid"`

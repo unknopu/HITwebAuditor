@@ -13,6 +13,7 @@ import (
 type Interface interface {
 	TestDB(c echo.Context) error
 	TestRedis(c echo.Context) error
+	HealthCheck(c echo.Context) error
 }
 
 // Handler me handler
@@ -57,4 +58,8 @@ func (h *Handler) TestRedis(c echo.Context) error {
 		return err
 	}
 	return c.JSON(http.StatusOK, u)
+}
+
+func (h *Handler) HealthCheck(c echo.Context) error {
+	return c.JSON(http.StatusOK, &Healthcheck{Status: "healthy"})
 }

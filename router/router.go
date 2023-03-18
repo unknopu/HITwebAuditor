@@ -113,8 +113,10 @@ func NewWithOptions(options *Options, context *app.Context) *echo.Echo {
 
 	meGroup := api.Group("/me")
 	{
+
 		meGroup.GET("/mongodb", meHandler.TestDB)
 		meGroup.GET("/redis", meHandler.TestRedis)
+		meGroup.GET("/healthcheck", meHandler.HealthCheck)
 	}
 
 	SQLiGroup := api.Group("/sqli")
