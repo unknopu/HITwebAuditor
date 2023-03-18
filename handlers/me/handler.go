@@ -43,10 +43,8 @@ func NewHandler(c *app.Context) Interface {
 // TestDB test db
 func (h *Handler) TestDB(c echo.Context) error {
 	cc := c.(*context.Context)
-	rsp, err := h.ms.TestDB(cc)
-	if err != nil {
-		return err
-	}
+	rsp, _ := h.ms.TestDB(cc)
+
 	return c.JSON(http.StatusOK, rsp)
 }
 

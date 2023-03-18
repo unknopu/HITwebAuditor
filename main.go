@@ -74,10 +74,7 @@ func main() {
 		Root:         envConfig.DatabaseRoot,
 		Debug:        !envConfig.Release,
 	}
-	if os.Getenv("IS_CLOUD") == "true" {
-		mongodbOptions.URL = "mongodb"
-		mongodbOptions.DatabaseName = ""
-	}
+
 	err = mongodb.InitDatabase(mongodbOptions)
 	if err != nil {
 		panic(err)

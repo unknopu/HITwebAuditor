@@ -35,3 +35,10 @@ type Activity struct {
 	UserAgent     string              `json:"user_agent,omitempty" bson:"user_agent,omitempty"`
 	ReferenceID   *primitive.ObjectID `json:"reference_id,omitempty" bson:"reference_id"`
 }
+
+type HealthCheck struct {
+	mongodb.Model `bson:",inline"`
+	Description   string `json:"description,omitempty" bson:"description,omitempty"`
+	ClientIP      string `json:"client_ip,omitempty" bson:"client_ip,omitempty"`
+	UserAgent     string `json:"user_agent,omitempty" bson:"user_agent,omitempty"`
+}

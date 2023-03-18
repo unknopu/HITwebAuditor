@@ -42,15 +42,29 @@ func NewService(c *app.Context) ServiceInterface {
 }
 
 func (s *Service) TestDB(c *context.Context) (interface{}, error) {
-	m := &entities.AccessToken{}
+	m := &entities.HealthCheck{
+		Description: "test mongodb",
+		ClientIP:    c.RealIP(),
+		UserAgent:   c.GetUserSession().UserAgent,
+	}
+	var msg string
 	err := s.rp.Create(m)
-	rsp := &Healthcheck{Message: err.Error(), IsHealthy: err == nil}
+	if err != nil {
+		msg = err.Error()
+	}
+	rsp := &Healthcheck{Message: msg, IsHealthy: err == nil}
 	return rsp, nil
 }
 
 func (s *Service) TestRedis(c *context.Context) (interface{}, error) {
 	var msg string
+	rsp := &Healthcheck{}
+
 	ctx := cc.Background()
+	if s.redis == nil {
+		rsp.Message = "Redis servier not found"
+		return rsp, nil
+	}
 	val, err := s.redis.Get(ctx, "testXX").Result()
 	if err != nil {
 		val = "myData"
@@ -60,6 +74,7 @@ func (s *Service) TestRedis(c *context.Context) (interface{}, error) {
 		msg = err.Error()
 	}
 
-	rsp := &Healthcheck{Message: msg, IsHealthy: err == nil}
+	rsp.Message = msg
+	rsp.IsHealthy = true
 	return rsp, nil
 }
