@@ -43,24 +43,24 @@ func NewHandler(c *app.Context) Interface {
 // TestDB test db
 func (h *Handler) TestDB(c echo.Context) error {
 	cc := c.(*context.Context)
-	_, err := h.ms.TestDB(cc)
+	rsp, err := h.ms.TestDB(cc)
 	if err != nil {
 		return err
 	}
-	return c.JSON(http.StatusOK, &Healthcheck{Status: "mongodb is healthy"})
+	return c.JSON(http.StatusOK, rsp)
 }
 
 // TestRedis test redis
 func (h *Handler) TestRedis(c echo.Context) error {
 	cc := c.(*context.Context)
-	_, err := h.ms.TestRedis(cc)
+	rsp, err := h.ms.TestRedis(cc)
 	if err != nil {
 		return err
 	}
-	return c.JSON(http.StatusOK, &Healthcheck{Status: "redis is healthy"})
+	return c.JSON(http.StatusOK, rsp)
 
 }
 
 func (h *Handler) HealthCheck(c echo.Context) error {
-	return c.JSON(http.StatusOK, &Healthcheck{Status: "healthy"})
+	return c.JSON(http.StatusOK, &Healthcheck{Message: "back-end is healthy", IsHealthy: true})
 }

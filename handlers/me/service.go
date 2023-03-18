@@ -6,7 +6,6 @@ import (
 	"auditor/core/google"
 	"auditor/entities"
 	cc "context"
-	"fmt"
 	"time"
 
 	"github.com/go-redis/redis/v8"
@@ -43,16 +42,14 @@ func NewService(c *app.Context) ServiceInterface {
 }
 
 func (s *Service) TestDB(c *context.Context) (interface{}, error) {
-	uid := c.GetUserSession().UserID
 	m := &entities.AccessToken{}
 	err := s.rp.Create(m)
-	if err != nil {
-		return nil, err
-	}
-	return uid, nil
+	rsp := &Healthcheck{Message: err.Error(), IsHealthy: err == nil}
+	return rsp, nil
 }
 
 func (s *Service) TestRedis(c *context.Context) (interface{}, error) {
+	var msg string
 	ctx := cc.Background()
 	val, err := s.redis.Get(ctx, "testXX").Result()
 	if err != nil {
@@ -60,9 +57,9 @@ func (s *Service) TestRedis(c *context.Context) (interface{}, error) {
 
 		time.Sleep(2 * time.Second)
 		err := s.redis.Set(ctx, "testXX", val, 1*time.Minute).Err()
-		if err != nil {
-			return nil, err
-		}
+		msg = err.Error()
 	}
-	return fmt.Sprintf("[%v]", val), nil
+
+	rsp := &Healthcheck{Message: msg, IsHealthy: err == nil}
+	return rsp, nil
 }

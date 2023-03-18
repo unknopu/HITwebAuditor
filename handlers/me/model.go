@@ -5,7 +5,8 @@ import (
 )
 
 type Healthcheck struct {
-	Status string `json:"status"`
+	Message   string `json:"status"`
+	IsHealthy bool   `json:"is_healthy"`
 }
 
 type Request struct {
