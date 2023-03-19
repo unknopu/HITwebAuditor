@@ -32,9 +32,9 @@ func init() {
 // @in header
 // @name Authorization
 func main() {
-	// if os.Getenv("RELEASE") != "" {
-	initConfigFile()
-	// }
+	if os.Getenv("RELEASE") != "" {
+		initConfigFile()
+	}
 
 	// configPath := os.Getenv("CONFIG_PATH")
 	// if configPath == "" {
