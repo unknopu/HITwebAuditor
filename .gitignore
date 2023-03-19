@@ -18,3 +18,4 @@ launch.json
 .idea
 
 configs/
+config.yaml

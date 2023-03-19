@@ -2,6 +2,7 @@ package main
 
 import (
 	cc "context"
+	"fmt"
 	"os"
 	"time"
 
@@ -31,16 +32,32 @@ func init() {
 // @in header
 // @name Authorization
 func main() {
+	// if os.Getenv("RELEASE") != "" {
+	initConfigFile()
+	// }
 
-	configPath := os.Getenv("CONFIG_PATH")
-	if configPath == "" {
-		configPath = "configs"
+	// configPath := os.Getenv("CONFIG_PATH")
+	// if configPath == "" {
+	configPath := "configs"
+	// }
+	envConfig, err := env.Read(configPath)
+	if err != nil {
+		fmt.Println(err)
+		panic(err)
 	}
-	envConfig, _ := env.Read(configPath)
+	return
 
 	translator.InitTranslator()
-	mongodbOptions := validateMongoDB(envConfig)
-	err := mongodb.InitDatabase(mongodbOptions)
+	mongodbOptions := &mongodb.Options{
+		URL:          envConfig.DatabaseURL,
+		Port:         envConfig.DatabasePort,
+		DatabaseName: envConfig.DatabaseName,
+		Username:     envConfig.DatabaseUsername,
+		Password:     envConfig.DatabasePassword,
+		Root:         envConfig.DatabaseRoot,
+		Debug:        !envConfig.Release,
+	}
+	err = mongodb.InitDatabase(mongodbOptions)
 	if err != nil {
 		panic(err)
 	}
@@ -84,32 +101,31 @@ func main() {
 	server.New(router.NewWithOptions(options, context), "8000").Start()
 }
 
-func validateMongoDB(envConfig *env.Environment) *mongodb.Options {
+func initConfigFile() {
+	f, err := os.Create("config.yaml")
+	if err != nil {
+		log.Fatal(err)
+	}
+	defer f.Close()
 
-	if os.Getenv("RELEASE") == "" || envConfig == nil {
-		return &mongodb.Options{
-			URL:          envConfig.DatabaseURL,
-			Port:         envConfig.DatabasePort,
-			DatabaseName: envConfig.DatabaseName,
-			Username:     envConfig.DatabaseUsername,
-			Password:     envConfig.DatabasePassword,
-			Root:         envConfig.DatabaseRoot,
-			Debug:        !envConfig.Release,
-		}
+	configs, err := os.OpenFile("config.yaml",
+		os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0644)
+	if err != nil {
+		panic(err)
 	}
 
-	DATA_BASE_URL := os.Getenv("DATA_BASE_URL")
-	DATA_BASE_NAME := os.Getenv("DATA_BASE_NAME")
-	DATA_BASE_USERNAME := os.Getenv("DATA_BASE_USERNAME")
-	DATA_BASE_PASSWORD := os.Getenv("DATA_BASE_PASSWORD")
-
-	return &mongodb.Options{
-		URL:          DATA_BASE_URL,
-		Port:         27017,
-		DatabaseName: DATA_BASE_NAME,
-		Root:         true,
-		Username:     DATA_BASE_USERNAME,
-		Password:     DATA_BASE_PASSWORD,
-		Debug:        true,
+	d1 := (fmt.Sprintf("DATA_BASE_URL: %v\n", os.Getenv("DATA_BASE_URL")))
+	_, err = configs.WriteString(d1)
+	if err != nil {
+		panic(err)
 	}
+
+	d2 := (fmt.Sprintf("DATA_BASE_NAME: %v\n", os.Getenv("DATA_BASE_NAME")))
+	_, err = configs.WriteString(d2)
+
+	d3 := (fmt.Sprintf("DATA_BASE_USERNAME: %v\n", os.Getenv("DATA_BASE_USERNAME")))
+	_, err = configs.WriteString(d3)
+
+	d4 := (fmt.Sprintf("DATA_BASE_PASSWORD: %v\n", os.Getenv("DATA_BASE_PASSWORD")))
+	_, err = configs.WriteString(d4)
 }
