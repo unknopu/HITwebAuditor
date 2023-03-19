@@ -46,7 +46,7 @@ func main() {
 	}
 
 	context := app.NewContext(envConfig)
-	if envConfig.RedisOn {
+	if os.Getenv("RedisOn") != "" {
 		client := redis.NewClient(&redis.Options{
 			Addr:     envConfig.RedisHost,
 			Password: envConfig.RedisPassword,
