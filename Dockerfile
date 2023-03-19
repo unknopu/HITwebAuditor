@@ -24,7 +24,6 @@ COPY --from=builder /api/api .
 COPY pkey.pem .
 COPY active.en.toml .
 COPY active.th.toml .
-ADD /configs /configs
 
 EXPOSE 8000
 
