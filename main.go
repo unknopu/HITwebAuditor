@@ -85,7 +85,8 @@ func main() {
 }
 
 func validateMongoDB(envConfig *env.Environment) *mongodb.Options {
-	if os.Getenv("RELEASE") == "" {
+
+	if os.Getenv("RELEASE") == "" || envConfig == nil {
 		return &mongodb.Options{
 			URL:          envConfig.DatabaseURL,
 			Port:         envConfig.DatabasePort,
