@@ -19,4 +19,28 @@ spec:
         image: unknopu/l190202102
         ports:
         - containerPort: 8000
+        env:
+        - name: RELEASE
+          value: "true"
+        - name: DATA_BASE_URL
+          valueFrom:
+            configMapKeyRef: 
+              name: mongo-express-configmap
+              key: DATA_BASE_URL
+        - name: DATA_BASE_NAME
+          valueFrom:
+            secretKeyRef:
+              name: mongo-secret
+              key: DATA_BASE_NAME
+        - name: DATA_BASE_USERNAME
+          valueFrom:
+            secretKeyRef:
+              name: mongo-secret
+              key: DATA_BASE_USERNAME
+        - name: DATA_BASE_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: mongo-secret
+              key: DATA_BASE_PASSWORD
+
         

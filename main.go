@@ -13,10 +13,7 @@ import (
 	"auditor/core/mongodb"
 	"auditor/core/server"
 	"auditor/core/translator"
-	"auditor/core/utils"
-	"auditor/docs"
 	_ "auditor/docs"
-	"auditor/entities"
 	"auditor/env"
 	"auditor/logx"
 	"auditor/middleware"
@@ -28,15 +25,6 @@ func init() {
 
 	//runtime.GOMAXPROCS(1)
 }
-
-// @title Boot Mobile API DOCS
-// @version 1.0
-// @description This is a sample server celler server.
-// @termsOfService http://swagger.io/terms/
-
-// @contact.name API Support
-// @contact.url http://www.swagger.io/support
-// @contact.email support@swagger.io
 
 // @host localhost:8000
 // @BasePath /api/v1
@@ -57,24 +45,9 @@ func main() {
 		panic(err)
 	}
 
-	docs.SwaggerInfo.Host = envConfig.SwaggerHost
-	docs.SwaggerInfo.BasePath = envConfig.SwaggerBasePath
-
 	translator.InitTranslator()
-	utils.InitSecureCookie(envConfig.CookieHashKey, envConfig.CookieBlockKey)
 
-	entities.BaseURL = envConfig.WebURL
-	databaseURL := envConfig.DatabaseURL
-	mongodbOptions := &mongodb.Options{
-		URL:          databaseURL,
-		Port:         envConfig.DatabasePort,
-		DatabaseName: envConfig.DatabaseName,
-		Username:     envConfig.DatabaseUsername,
-		Password:     envConfig.DatabasePassword,
-		Root:         envConfig.DatabaseRoot,
-		Debug:        !envConfig.Release,
-	}
-
+	mongodbOptions := validateMongoDB(envConfig)
 	err = mongodb.InitDatabase(mongodbOptions)
 	if err != nil {
 		panic(err)
@@ -118,4 +91,33 @@ func main() {
 	// go schedule.Start()
 
 	server.New(router.NewWithOptions(options, context), envConfig.ServerPort).Start()
+}
+
+func validateMongoDB(envConfig *env.Environment) *mongodb.Options {
+	if os.Getenv("RELEASE") == "" {
+		return &mongodb.Options{
+			URL:          envConfig.DatabaseURL,
+			Port:         envConfig.DatabasePort,
+			DatabaseName: envConfig.DatabaseName,
+			Username:     envConfig.DatabaseUsername,
+			Password:     envConfig.DatabasePassword,
+			Root:         envConfig.DatabaseRoot,
+			Debug:        !envConfig.Release,
+		}
+	}
+
+	DATA_BASE_URL := os.Getenv("DATA_BASE_URL")
+	DATA_BASE_NAME := os.Getenv("DATA_BASE_NAME")
+	DATA_BASE_USERNAME := os.Getenv("DATA_BASE_USERNAME")
+	DATA_BASE_PASSWORD := os.Getenv("DATA_BASE_PASSWORD")
+
+	return &mongodb.Options{
+		URL:          DATA_BASE_URL,
+		Port:         27017,
+		DatabaseName: DATA_BASE_NAME,
+		Root:         true,
+		Username:     DATA_BASE_USERNAME,
+		Password:     DATA_BASE_PASSWORD,
+		Debug:        true,
+	}
 }
