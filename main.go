@@ -81,7 +81,7 @@ func main() {
 	// schedule := cron.NewCronJob(context)
 	// go schedule.Start()
 
-	server.New(router.NewWithOptions(options, context), envConfig.ServerPort).Start()
+	server.New(router.NewWithOptions(options, context), "8000").Start()
 }
 
 func validateMongoDB(envConfig *env.Environment) *mongodb.Options {
