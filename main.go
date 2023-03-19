@@ -35,7 +35,7 @@ func main() {
 	configPath := "configs"
 	if os.Getenv("RELEASE") != "" {
 		initConfigFile()
-		configPath = ""
+		configPath = "./"
 	}
 
 	envConfig, err := env.Read(configPath)
