@@ -17,7 +17,6 @@ import (
 	"auditor/env"
 	"auditor/logx"
 	"auditor/middleware"
-	"auditor/response"
 	"auditor/router"
 )
 
@@ -39,19 +38,14 @@ func main() {
 	}
 	envConfig, _ := env.Read(configPath)
 
-	r, err := response.ReadReturnResult(configPath, "return_results")
-	if err != nil {
-		panic(err)
-	}
-
 	translator.InitTranslator()
 	mongodbOptions := validateMongoDB(envConfig)
-	err = mongodb.InitDatabase(mongodbOptions)
+	err := mongodb.InitDatabase(mongodbOptions)
 	if err != nil {
 		panic(err)
 	}
 
-	context := app.NewContext(envConfig, r)
+	context := app.NewContext(envConfig)
 	if envConfig.RedisOn {
 		client := redis.NewClient(&redis.Options{
 			Addr:     envConfig.RedisHost,
@@ -70,7 +64,6 @@ func main() {
 
 	options := &router.Options{
 		Environment: envConfig,
-		Results:     r,
 	}
 	if envConfig.Release {
 		logx.Init("main", "trace")

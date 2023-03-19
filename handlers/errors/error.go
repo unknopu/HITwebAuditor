@@ -1,7 +1,6 @@
 package errors
 
 import (
-	"auditor/response"
 	"net/http"
 
 	"github.com/labstack/echo/v4"
@@ -15,9 +14,6 @@ func HTTPErrorHandler(err error, c echo.Context) {
 	if he, ok := err.(*echo.HTTPError); ok {
 		code = he.Code
 		message = map[string]interface{}{"message": he.Message}
-	} else if he, ok := err.(response.Error); ok {
-		code = http.StatusBadRequest
-		message = he
 	} else {
 		code = http.StatusBadRequest
 		message = map[string]string{"message": err.Error()}

@@ -16,4 +16,5 @@ launch.json
 # Mac OSX
 .DS_Store
 .idea
+
 configs/config.yml

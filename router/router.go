@@ -19,7 +19,6 @@ import (
 	"auditor/handlers/sql"
 	middlewareLog "auditor/middleware"
 	myMiddleware "auditor/middleware"
-	"auditor/response"
 )
 
 var (
@@ -33,7 +32,6 @@ type Options struct {
 	LogHeader     string
 	LogMiddleware echo.MiddlewareFunc
 	Environment   *env.Environment
-	Results       *response.Results
 }
 
 func initEcho(m *middlewareLog.Middleware) *echo.Echo {
@@ -99,7 +97,6 @@ func NewWithOptions(options *Options, context *app.Context) *echo.Echo {
 	api.Use(
 		middleware.Secure(),
 		middleware.Gzip(),
-		myMiddleware.WrapResponse(options.Results),
 		myMiddleware.ActivityLog(),
 	)
 
