@@ -32,13 +32,14 @@ func init() {
 // @in header
 // @name Authorization
 func main() {
+	configPath := "configs"
 	if os.Getenv("RELEASE") != "" {
 		initConfigFile()
+		configPath = ""
 	}
 
 	// configPath := os.Getenv("CONFIG_PATH")
 	// if configPath == "" {
-	configPath := "configs"
 	// }
 	envConfig, err := env.Read(configPath)
 	if err != nil {
