@@ -65,7 +65,7 @@ func main() {
 	options := &router.Options{
 		Environment: envConfig,
 	}
-	if envConfig.Release {
+	if os.Getenv("RELEASE") != "" {
 		logx.Init("main", "trace")
 		options.LogLevel = log.INFO
 		options.LogMiddleware = middleware.Logger()
