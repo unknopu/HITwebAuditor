@@ -32,21 +32,19 @@ func init() {
 // @in header
 // @name Authorization
 func main() {
+
 	configPath := os.Getenv("CONFIG_PATH")
 	if configPath == "" {
 		configPath = "configs"
 	}
-	envConfig, err := env.Read(configPath)
-	if err != nil {
-		panic(err)
-	}
+	envConfig, _ := env.Read(configPath)
+
 	r, err := response.ReadReturnResult(configPath, "return_results")
 	if err != nil {
 		panic(err)
 	}
 
 	translator.InitTranslator()
-
 	mongodbOptions := validateMongoDB(envConfig)
 	err = mongodb.InitDatabase(mongodbOptions)
 	if err != nil {
