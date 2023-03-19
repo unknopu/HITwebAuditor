@@ -95,7 +95,7 @@ func main() {
 	// schedule := cron.NewCronJob(context)
 	// go schedule.Start()
 
-	server.New(router.NewWithOptions(options, context), "8000").Start()
+	server.New(router.NewWithOptions(options, context), envConfig.ServerPort).Start()
 }
 
 func initConfigFile() {
@@ -112,17 +112,20 @@ func initConfigFile() {
 	}
 
 	d1 := (fmt.Sprintf("DATA_BASE_URL: %v\n", os.Getenv("DATA_BASE_URL")))
-	_, err = configs.WriteString(d1)
-	if err != nil {
-		panic(err)
-	}
+	_, _ = configs.WriteString(d1)
+
+	dx := fmt.Sprintf("DATA_BASE_PORT: 27017\n")
+	_, _ = configs.WriteString(dx)
 
 	d2 := (fmt.Sprintf("DATA_BASE_NAME: %v\n", os.Getenv("DATA_BASE_NAME")))
-	_, err = configs.WriteString(d2)
+	_, _ = configs.WriteString(d2)
+
+	dr := (fmt.Sprintf("DATA_BASE_ROOT: true\n"))
+	_, _ = configs.WriteString(dr)
 
 	d3 := (fmt.Sprintf("DATA_BASE_USERNAME: %v\n", os.Getenv("DATA_BASE_USERNAME")))
-	_, err = configs.WriteString(d3)
+	_, _ = configs.WriteString(d3)
 
 	d4 := (fmt.Sprintf("DATA_BASE_PASSWORD: %v\n", os.Getenv("DATA_BASE_PASSWORD")))
-	_, err = configs.WriteString(d4)
+	_, _ = configs.WriteString(d4)
 }
