@@ -17,4 +17,4 @@ launch.json
 .DS_Store
 .idea
 
-configs/config.yml
+configs/
