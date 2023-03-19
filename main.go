@@ -33,10 +33,10 @@ func init() {
 // @name Authorization
 func main() {
 	configPath := "configs"
-	if os.Getenv("RELEASE") != "" {
-		initConfigFile()
-		configPath = "./"
-	}
+	// if os.Getenv("RELEASE") != "" {
+	initConfigFile()
+	configPath = "./"
+	// }
 
 	envConfig, err := env.Read(configPath)
 	if err != nil {
@@ -95,7 +95,10 @@ func main() {
 	// schedule := cron.NewCronJob(context)
 	// go schedule.Start()
 
-	server.New(router.NewWithOptions(options, context), envConfig.ServerPort).Start()
+	rt := router.NewWithOptions(options, context)
+	fmt.Println(rt == nil)
+
+	server.New(rt, envConfig.ServerPort).Start()
 }
 
 func initConfigFile() {
@@ -111,24 +114,31 @@ func initConfigFile() {
 		panic(err)
 	}
 
-	d1 := (fmt.Sprintf("DATA_BASE_URL: %v\n", os.Getenv("DATA_BASE_URL")))
+	d1 := fmt.Sprintf("DATA_BASE_URL: %v\n", os.Getenv("DATA_BASE_URL"))
 	_, _ = configs.WriteString(d1)
 
 	dx := fmt.Sprintf("DATA_BASE_PORT: 27017\n")
 	_, _ = configs.WriteString(dx)
 
-	d2 := (fmt.Sprintf("DATA_BASE_NAME: %v\n", os.Getenv("DATA_BASE_NAME")))
+	d2 := fmt.Sprintf("DATA_BASE_NAME: %v\n", os.Getenv("DATA_BASE_NAME"))
 	_, _ = configs.WriteString(d2)
 
-	dr := (fmt.Sprintf("DATA_BASE_ROOT: true\n"))
+	dr := fmt.Sprintf("DATA_BASE_ROOT: true\n")
 	_, _ = configs.WriteString(dr)
 
-	d3 := (fmt.Sprintf("DATA_BASE_USERNAME: %v\n", os.Getenv("DATA_BASE_USERNAME")))
+	d3 := fmt.Sprintf("DATA_BASE_USERNAME: %v\n", os.Getenv("DATA_BASE_USERNAME"))
 	_, _ = configs.WriteString(d3)
 
-	d4 := (fmt.Sprintf("DATA_BASE_PASSWORD: %v\n", os.Getenv("DATA_BASE_PASSWORD")))
+	d4 := fmt.Sprintf("DATA_BASE_PASSWORD: %v\n", os.Getenv("DATA_BASE_PASSWORD"))
 	_, _ = configs.WriteString(d4)
 
-	dport := fmt.Sprintf("SERVER_PORT: 8000\n")
+	drelease := fmt.Sprintf("RELEASE: false\n")
+	_, _ = configs.WriteString(drelease)
+
+	dprod := fmt.Sprintf("PRODUCTION: false\n")
+	_, _ = configs.WriteString(dprod)
+
+	dport := fmt.Sprintf("SERVER_PORT: :8000\n")
 	_, _ = configs.WriteString(dport)
+
 }

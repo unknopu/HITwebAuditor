@@ -66,12 +66,6 @@ func NewWithOptions(options *Options, context *app.Context) *echo.Echo {
 	router.HTTPErrorHandler = errors.HTTPErrorHandler
 
 	router.Logger.SetPrefix("BOOTS")
-	// healthCheckHandler := healthcheck.NewHandler()
-	// router.GET("/health", healthCheckHandler.HealthCheck)
-	// jwtMiddleware := myMiddleware.Cookie(options.Environment.JWTSecret, true)
-	// jwtNoneRequiredMiddleware := myMiddleware.Cookie(options.Environment.JWTSecret, false)
-	// jwtPartnerMiddleware := middleware.JWT([]byte(options.Environment.PartnerJWTSecret))
-	// userAgentMiddleware := myMiddleware.CheckUserAgent("374", "377")
 
 	api := router.Group("/api/:version")
 	api.Use(middleware.CORSWithConfig(middleware.CORSConfig{
