@@ -128,4 +128,7 @@ func initConfigFile() {
 
 	d4 := (fmt.Sprintf("DATA_BASE_PASSWORD: %v\n", os.Getenv("DATA_BASE_PASSWORD")))
 	_, _ = configs.WriteString(d4)
+
+	dport := fmt.Sprintf("SERVER_PORT: 8000\n")
+	_, _ = configs.WriteString(dport)
 }
