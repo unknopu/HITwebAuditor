@@ -38,15 +38,11 @@ func main() {
 		configPath = ""
 	}
 
-	// configPath := os.Getenv("CONFIG_PATH")
-	// if configPath == "" {
-	// }
 	envConfig, err := env.Read(configPath)
 	if err != nil {
 		fmt.Println(err)
 		panic(err)
 	}
-	return
 
 	translator.InitTranslator()
 	mongodbOptions := &mongodb.Options{
