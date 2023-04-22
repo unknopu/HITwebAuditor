@@ -16,7 +16,9 @@ import (
 	"auditor/core/validator"
 	"auditor/env"
 	"auditor/handlers/me"
+	"auditor/handlers/spider"
 	"auditor/handlers/sql"
+	"auditor/handlers/sqli"
 	middlewareLog "auditor/middleware"
 	myMiddleware "auditor/middleware"
 )
@@ -101,6 +103,8 @@ func NewWithOptions(options *Options, context *app.Context) *echo.Echo {
 
 	meHandler := me.NewHandler(context)
 	SQLIHandler := sql.NewHandler(context)
+	spiderHandler := spider.NewHandler(context)
+	SqliHandler := sqli.NewHandler(context)
 
 	meGroup := api.Group("/me")
 	{
@@ -116,6 +120,14 @@ func NewWithOptions(options *Options, context *app.Context) *echo.Echo {
 		SQLiGroup.POST("", SQLIHandler.Init)
 		SQLiGroup.POST("/error", SQLIHandler.ErrorBased)
 		// SQLiGroup.POST("/union", SQLIHandler.UnionBased)
+
+		// ==================================== v2
+		SQLiGroup.POST("/start", SqliHandler.Init)
+	}
+
+	spiderGroup := api.Group("/spider")
+	{
+		spiderGroup.POST("/start", spiderHandler.Start)
 	}
 
 	return router

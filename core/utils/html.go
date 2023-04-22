@@ -5,9 +5,6 @@ import (
 	"io/ioutil"
 	"log"
 	"net/http"
-	"strings"
-
-	"github.com/k3a/html2text"
 )
 
 var (
@@ -39,17 +36,5 @@ func GetPageHTML(pageURL, cookie string) string {
 
 func GetPageLength(pageURL, cookie string) int {
 	html := GetPageHTML(pageURL, cookie)
-	if strings.Contains(html, "<head>") {
-		afterHeadHTML := strings.SplitAfter(string(html), "<head>")
-		plain := html2text.HTML2Text(afterHeadHTML[1])
-		return len(plain)
-	}
 	return len(html)
-}
-
-func setCookie(value string) *http.Cookie {
-	return &http.Cookie{
-		Name:  "Cookie",
-		Value: value,
-	}
 }

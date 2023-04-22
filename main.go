@@ -33,10 +33,10 @@ func init() {
 // @name Authorization
 func main() {
 	configPath := "configs"
-	// if os.Getenv("RELEASE") != "" {
-	initConfigFile()
-	configPath = "./"
-	// }
+	if os.Getenv("RELEASE") != "" {
+		initConfigFile()
+		configPath = "./"
+	}
 
 	envConfig, err := env.Read(configPath)
 	if err != nil {
@@ -79,11 +79,7 @@ func main() {
 	options := &router.Options{
 		Environment: envConfig,
 	}
-	// if os.Getenv("RELEASE") != "" {
-	// 	logx.Init("main", "trace")
-	// 	options.LogLevel = log.INFO
-	// 	options.LogMiddleware = middleware.Logger()
-	// } else {
+
 	logx.Init("main", "debug")
 	options.LogLevel = log.DEBUG
 	options.LogHeader = "\033[1;34m-->\033[0m ${time_rfc3339} ${level}"
@@ -91,9 +87,6 @@ func main() {
 		Format: "\033[1;34m-->\033[0m method=${method} \033[1;32muri=${uri}\033[0m user_agent=${user_agent} " +
 			"statu=${status} error=${error} latency_human=${latency_human}, \033[1;93mparameters=${parameters}\033[0m\n",
 	})
-	// }
-	// schedule := cron.NewCronJob(context)
-	// go schedule.Start()
 
 	rt := router.NewWithOptions(options, context)
 	fmt.Println(rt == nil)
