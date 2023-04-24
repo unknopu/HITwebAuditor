@@ -1,10 +1,10 @@
-package lfi
+package xss
 
 import (
 	"auditor/app"
 	"auditor/core/context"
 	"auditor/entities"
-	"regexp"
+	"strings"
 	"sync"
 )
 
@@ -15,7 +15,7 @@ var (
 
 // ServiceInterface service interface
 type ServiceInterface interface {
-	Init(c *context.Context, f *LFIForm) (interface{}, error)
+	Init(c *context.Context, f *XSSForm) (interface{}, error)
 }
 
 // Service  repo
@@ -32,30 +32,26 @@ func NewService(c *app.Context) ServiceInterface {
 	}
 }
 
-func (s *Service) Init(c *context.Context, f *LFIForm) (interface{}, error) {
+func (s *Service) Init(c *context.Context, f *XSSForm) (interface{}, error) {
 	option := f.URLOptions()
 
 	var p []string
-	rule := `(?m)^[a-z_][a-z0-9_-]{0,30}[a-z0-9_$-]?:[^:]*:\d+:\d+:[^:]*:[^:]*:[^:]*$`
 	for _, payload := range payloads {
-		responseBody := injectPayload(*option, payload)
-
-		isMatch, err := regexp.MatchString(rule, responseBody)
-		if err != nil {
-			return nil, err
-		}
-
-		if isMatch {
+		bodyTag := fetchTagBody(*option, payload)
+		if strings.ContainsAny(bodyTag, payload) {
 			p = append(p, payload)
+		}
+		if len(p) > 5 {
+			break
 		}
 	}
 
-	report := &entities.LFIReport{
+	report := &entities.XSSReport{
 		Location:       f.URL,
 		Payload:        p,
 		Level:          []string{"High"},
-		Type:           entities.Broken,
-		Vaulnerability: []entities.VULNERABILITY{entities.LocalFileIncusion},
+		Type:           entities.Injection,
+		Vaulnerability: []entities.VULNERABILITY{entities.CrossSiteScripting},
 	}
 
 	return report, nil

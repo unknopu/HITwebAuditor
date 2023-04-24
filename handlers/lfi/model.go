@@ -1,6 +1,5 @@
 package lfi
 
-
 import (
 	"auditor/core/utils"
 	"auditor/entities"
@@ -9,10 +8,10 @@ import (
 )
 
 const (
-	Boolean = "Boolean Based SQL Injection"
+	lfi = "Local File Inclusion"
 )
 
-type SqliForm struct {
+type LFIForm struct {
 	common.PageQuery
 	MethodRefer string `json:"mehod"`
 	URL         string `json:"url"`
@@ -21,32 +20,18 @@ type SqliForm struct {
 	JWT         string `json:"jwt"`
 }
 
-func (f SqliForm) URLOptions() *entities.SQLi {
+func (f LFIForm) URLOptions() *entities.LFI {
 	webURL, err := url.Parse(f.URL)
 	if err != nil {
 		return nil
 	}
 
 	queries, _ := url.ParseQuery(webURL.RawQuery)
-	p, pValue := fetchParam(queries, f.Param)
+	p, pValue := utils.FetchParam(queries, f.Param)
 
-	return &entities.SQLi{
+	return &entities.LFI{
 		URL:            webURL,
-		PageOrigin:     utils.GetPageHTML(webURL.String(), f.Cookie),
-		PageLength:     utils.GetPageLength(webURL.String(), f.Cookie),
 		Parameter:      p,
 		ParameterValue: pValue,
-		Cookie:         f.Cookie,
 	}
-}
-
-func fetchParam(vs url.Values, param string) (string, string) {
-	var key, value string
-	for v := range vs {
-		if param == v {
-			return v, vs.Get(v)
-		}
-		key, value = v, vs.Get(v)
-	}
-	return key, value
 }

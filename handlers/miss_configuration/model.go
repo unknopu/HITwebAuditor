@@ -1,4 +1,4 @@
-package sqli
+package miss_configuration
 
 import (
 	"auditor/core/utils"
@@ -7,7 +7,12 @@ import (
 	"net/url"
 )
 
-type SqliForm struct {
+const (
+	SERVER_RULE   = `^(nginx|Nginx|apache|Apache)/(\d+\.)?(\d+\.)?(\*|\d+)`
+	POWERDBY_RULE = `^(php|PHP)/(\d+\.)?(\d+\.)?(\*|\d+)`
+)
+
+type MCForm struct {
 	common.PageQuery
 	MethodRefer string `json:"mehod"`
 	URL         string `json:"url"`
@@ -16,7 +21,7 @@ type SqliForm struct {
 	JWT         string `json:"jwt"`
 }
 
-func (f SqliForm) URLOptions() *entities.SQLi {
+func (f MCForm) URLOptions() *entities.MissConfiguration {
 	webURL, err := url.Parse(f.URL)
 	if err != nil {
 		return nil
@@ -25,12 +30,14 @@ func (f SqliForm) URLOptions() *entities.SQLi {
 	queries, _ := url.ParseQuery(webURL.RawQuery)
 	p, pValue := utils.FetchParam(queries, f.Param)
 
-	return &entities.SQLi{
+	return &entities.MissConfiguration{
 		URL:            webURL,
-		PageOrigin:     utils.GetPageHTML(webURL.String(), f.Cookie),
-		PageLength:     utils.GetPageLength(webURL.String(), f.Cookie),
 		Parameter:      p,
 		ParameterValue: pValue,
-		Cookie:         f.Cookie,
 	}
+}
+
+type HttpHeader struct {
+	Server     string `json:"server"`
+	XPoweredBy string `json:"x_powered_by"`
 }

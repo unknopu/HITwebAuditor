@@ -1,4 +1,6 @@
-package lfi
+package miss_configuration
+
+
 
 import (
 	"auditor/core/mongodb"

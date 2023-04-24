@@ -8,11 +8,11 @@ import (
 )
 
 var (
-	c = &tls.Config{InsecureSkipVerify: true}
+	C = &tls.Config{InsecureSkipVerify: true}
 )
 
 func GetPageHTML(pageURL, cookie string) string {
-	http.DefaultTransport.(*http.Transport).TLSClientConfig = c
+	http.DefaultTransport.(*http.Transport).TLSClientConfig = C
 
 	client := &http.Client{}
 	r, _ := http.NewRequest(http.MethodGet, pageURL, nil)

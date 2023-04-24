@@ -1,4 +1,4 @@
-package lfi
+package xss
 
 import (
 	"auditor/app"
@@ -29,7 +29,7 @@ func NewHandler(c *app.Context) Interface {
 
 func (h *Handler) Init(c echo.Context) error {
 	cc := c.(*context.Context)
-	f := &LFIForm{}
+	f := &XSSForm{}
 	if err := c.(*context.Context).BindAndValidate(f); err != nil {
 		return err
 	}

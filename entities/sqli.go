@@ -24,8 +24,9 @@ type SQLi struct {
 }
 
 type SQLiReport struct {
-	Base            []string `json:"base,omitempty"`
-	Location        string   `json:"location,omitempty"`
-	Level           []string `json:"level,omitempty"`
-	Vulnerabilities int      `json:"vulnerabilities,omitempty"`
+	Location       string          `json:"location,omitempty"`
+	Payload        []string        `json:"payload,omitempty"`
+	Level          []string        `json:"level,omitempty"`
+	Type           TYPE            `json:"type,omitempty"`
+	Vaulnerability []VULNERABILITY `json:"vaulnerability,omitempty"`
 }

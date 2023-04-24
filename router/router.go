@@ -15,10 +15,13 @@ import (
 	"auditor/app"
 	"auditor/core/validator"
 	"auditor/env"
+	"auditor/handlers/lfi"
 	"auditor/handlers/me"
-	"auditor/handlers/spider"
+	mc "auditor/handlers/miss_configuration"
 	"auditor/handlers/sql"
 	"auditor/handlers/sqli"
+	"auditor/handlers/xss"
+
 	middlewareLog "auditor/middleware"
 	myMiddleware "auditor/middleware"
 )
@@ -103,8 +106,11 @@ func NewWithOptions(options *Options, context *app.Context) *echo.Echo {
 
 	meHandler := me.NewHandler(context)
 	SQLIHandler := sql.NewHandler(context)
-	spiderHandler := spider.NewHandler(context)
+	// spiderHandler := spider.NewHandler(context)
 	SqliHandler := sqli.NewHandler(context)
+	LFIHandler := lfi.NewHandler(context)
+	XSSHandler := xss.NewHandler(context)
+	MissConfigHandler := mc.NewHandler(context)
 
 	meGroup := api.Group("/me")
 	{
@@ -125,9 +131,19 @@ func NewWithOptions(options *Options, context *app.Context) *echo.Echo {
 		SQLiGroup.POST("/start", SqliHandler.Init)
 	}
 
-	spiderGroup := api.Group("/spider")
+	LFIGroup := api.Group("/lfi")
 	{
-		spiderGroup.POST("/start", spiderHandler.Start)
+		LFIGroup.POST("/start", LFIHandler.Init)
+	}
+
+	XSSGroup := api.Group("/xss")
+	{
+		XSSGroup.POST("/start", XSSHandler.Init)
+	}
+
+	MissConfigGroup := api.Group("/mc")
+	{
+		MissConfigGroup.POST("/start", MissConfigHandler.Init)
 	}
 
 	return router

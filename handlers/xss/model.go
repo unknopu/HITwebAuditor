@@ -1,4 +1,4 @@
-package sqli
+package xss
 
 import (
 	"auditor/core/utils"
@@ -7,7 +7,7 @@ import (
 	"net/url"
 )
 
-type SqliForm struct {
+type XSSForm struct {
 	common.PageQuery
 	MethodRefer string `json:"mehod"`
 	URL         string `json:"url"`
@@ -16,7 +16,7 @@ type SqliForm struct {
 	JWT         string `json:"jwt"`
 }
 
-func (f SqliForm) URLOptions() *entities.SQLi {
+func (f XSSForm) URLOptions() *entities.XSS {
 	webURL, err := url.Parse(f.URL)
 	if err != nil {
 		return nil
@@ -25,12 +25,9 @@ func (f SqliForm) URLOptions() *entities.SQLi {
 	queries, _ := url.ParseQuery(webURL.RawQuery)
 	p, pValue := utils.FetchParam(queries, f.Param)
 
-	return &entities.SQLi{
+	return &entities.XSS{
 		URL:            webURL,
-		PageOrigin:     utils.GetPageHTML(webURL.String(), f.Cookie),
-		PageLength:     utils.GetPageLength(webURL.String(), f.Cookie),
 		Parameter:      p,
 		ParameterValue: pValue,
-		Cookie:         f.Cookie,
 	}
 }

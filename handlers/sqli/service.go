@@ -4,13 +4,13 @@ import (
 	"auditor/app"
 	"auditor/core/context"
 	"auditor/entities"
+	"errors"
 	"sync"
 )
 
 var (
-	options *entities.DBOptions
-	wg      = sync.WaitGroup{}
-	m       = sync.RWMutex{}
+	wg = sync.WaitGroup{}
+	m  = sync.RWMutex{}
 )
 
 // ServiceInterface service interface
@@ -35,6 +35,15 @@ func NewService(c *app.Context) ServiceInterface {
 func (s *Service) Init(c *context.Context, f *SqliForm) (interface{}, error) {
 	option := f.URLOptions()
 	IsPwn := tryInjection(*option)
-	
-	return IsPwn, nil
+
+	if IsPwn {
+		return &entities.SQLiReport{
+			Location:       f.URL,
+			Level:          []string{"Critical"},
+			Type:           entities.Injection,
+			Vaulnerability: []entities.VULNERABILITY{entities.SQLIboolean},
+		}, nil
+	}
+
+	return nil, errors.New("not found")
 }

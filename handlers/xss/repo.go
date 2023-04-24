@@ -1,4 +1,6 @@
-package lfi
+package xss
+
+
 
 import (
 	"auditor/core/mongodb"
