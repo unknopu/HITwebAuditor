@@ -15,6 +15,7 @@ require (
 	github.com/go-playground/universal-translator v0.17.0
 	github.com/go-redis/redis/v8 v8.9.0
 	github.com/golang-jwt/jwt v3.2.2+incompatible
+	github.com/jinzhu/copier v0.3.5 // indirect
 	github.com/k3a/html2text v1.1.0
 	github.com/labstack/echo/v4 v4.3.0
 	github.com/labstack/gommon v0.3.0

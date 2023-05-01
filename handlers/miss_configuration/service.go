@@ -4,7 +4,7 @@ import (
 	"auditor/app"
 	"auditor/core/context"
 	"auditor/entities"
-	"log"
+	"errors"
 	"regexp"
 	"strings"
 	"sync"
@@ -39,37 +39,49 @@ func (s *Service) Init(c *context.Context, f *MCForm) (interface{}, error) {
 	headerData := fetchHeaders(*option)
 
 	if !anyVersionLeak(headerData) {
-		return nil, nil
+		return nil, errors.New("no leak")
 	}
 
 	var server, powerBy string
-	var phpPWN, serverPWN bool
 	if headerData.Server != "" {
 		r := regexp.MustCompile(SERVER_RULE)
 		server = r.FindString(headerData.Server)
-		serverPWN = false
-		// serverPWN = checkPWNVersion(strings.Split(server, "/")[1], 1, 20)
 	}
 	if headerData.XPoweredBy != "" {
 		r := regexp.MustCompile(POWERDBY_RULE)
 		powerBy = r.FindString(headerData.XPoweredBy)
-		phpPWN = checkPWNVersion("7.1.0", 5, 3, 7, 0)
 	}
 
-	sv := strings.Split(server, "/")
-	pw := "7.1.0"
-	log.Println()
-	log.Println(sv, serverPWN)
-	log.Println(pw, phpPWN)
-	log.Println()
-
-	report := &entities.MissConfigurationReport{
-		Location:       f.URL,
-		Payload:        []string{server, powerBy},
-		Level:          []string{"LOW"},
-		Type:           entities.MisConfiguration,
-		Vaulnerability: []entities.VULNERABILITY{},
+	var reports []*entities.MissConfigurationReport
+	if server != "" {
+		if strings.ContainsAny(server, "nginxNginx") {
+			reports = append(reports, &entities.MissConfigurationReport{
+				Location:       f.URL,
+				Payload:        []string{server},
+				Level:          entities.LOW,
+				Type:           entities.MisConfiguration,
+				Vaulnerability: entities.NginxVersion,
+			})
+		}
+		if strings.ContainsAny(server, "apacheApache") {
+			reports = append(reports, &entities.MissConfigurationReport{
+				Location:       f.URL,
+				Payload:        []string{server},
+				Level:          entities.LOW,
+				Type:           entities.MisConfiguration,
+				Vaulnerability: entities.ApacheVersion,
+			})
+		}
+	}
+	if powerBy != "" {
+		reports = append(reports, &entities.MissConfigurationReport{
+			Location:       f.URL,
+			Payload:        []string{powerBy},
+			Level:          entities.LOW,
+			Type:           entities.MisConfiguration,
+			Vaulnerability: entities.PHPVersion,
+		})
 	}
 
-	return report, nil
+	return buildPageInfomation(reports), nil
 }

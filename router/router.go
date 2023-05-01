@@ -15,9 +15,13 @@ import (
 	"auditor/app"
 	"auditor/core/validator"
 	"auditor/env"
+	cf "auditor/handlers/cryptograhpical_failure"
+	odc "auditor/handlers/outdated_component"
+
 	"auditor/handlers/lfi"
 	"auditor/handlers/me"
 	mc "auditor/handlers/miss_configuration"
+	"auditor/handlers/report"
 	"auditor/handlers/sql"
 	"auditor/handlers/sqli"
 	"auditor/handlers/xss"
@@ -104,6 +108,7 @@ func NewWithOptions(options *Options, context *app.Context) *echo.Echo {
 		return c.String(http.StatusOK, "healthy\n")
 	})
 
+	ReportHandler := report.NewHandler(context)
 	meHandler := me.NewHandler(context)
 	SQLIHandler := sql.NewHandler(context)
 	// spiderHandler := spider.NewHandler(context)
@@ -111,13 +116,24 @@ func NewWithOptions(options *Options, context *app.Context) *echo.Echo {
 	LFIHandler := lfi.NewHandler(context)
 	XSSHandler := xss.NewHandler(context)
 	MissConfigHandler := mc.NewHandler(context)
+	CFHandler := cf.NewHandler(context)
+	OutdatedHandler := odc.NewHandler(context)
 
 	meGroup := api.Group("/me")
 	{
-
 		meGroup.GET("/mongodb", meHandler.TestDB)
 		meGroup.GET("/redis", meHandler.TestRedis)
 		meGroup.GET("/healthcheck", meHandler.HealthCheck)
+	}
+
+	ReportGroup := api.Group("/report")
+	{
+		ReportGroup.POST("", ReportHandler.Init)
+	}
+
+	CFGroup := api.Group("/cf")
+	{
+		CFGroup.POST("", CFHandler.Init)
 	}
 
 	SQLiGroup := api.Group("/sqli")
@@ -144,6 +160,11 @@ func NewWithOptions(options *Options, context *app.Context) *echo.Echo {
 	MissConfigGroup := api.Group("/mc")
 	{
 		MissConfigGroup.POST("/start", MissConfigHandler.Init)
+	}
+
+	OutdatedComponentGroup := api.Group("/odc")
+	{
+		OutdatedComponentGroup.POST("", OutdatedHandler.Init)
 	}
 
 	return router

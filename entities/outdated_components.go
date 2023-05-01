@@ -5,15 +5,14 @@ import (
 	"net/url"
 )
 
-type MissConfiguration struct {
+type OutdatedComponent struct {
 	mongodb.Model  `bson:",inline"`
 	URL            *url.URL `json:"url,omitempty"`
 	Parameter      string   `json:"param,omitempty"`
 	ParameterValue string   `json:"param_value,omitempty"`
 }
 
-type MissConfigurationReport struct {
-	mongodb.Model  `bson:",inline"`
+type OutdatedComponentsReport struct {
 	Location       string        `json:"location,omitempty"`
 	Payload        []string      `json:"payload,omitempty"`
 	Level          LEVEL         `json:"level,omitempty"`

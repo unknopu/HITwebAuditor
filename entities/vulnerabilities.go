@@ -1,13 +1,24 @@
 package entities
 
+import "fmt"
+
 type TYPE string
 type VULNERABILITY string
+type LEVEL string
 
 const (
-	Injection        TYPE = "INJECTION"
-	Broken           TYPE = "BROKEN ACCESS CONTROL"
-	Cryptography     TYPE = "CRYPTOGRAPHIC FAILURES"
-	MisConfiguration TYPE = "SECURITY MISCONFIGURATION"
+	LOW      LEVEL = "LOW"
+	MEDIUM   LEVEL = "MEDIUM"
+	HIGH     LEVEL = "HIGH"
+	CRITICAL LEVEL = "CRITICAL"
+)
+
+const (
+	Injection          TYPE = "INJECTION"
+	Broken             TYPE = "BROKEN ACCESS CONTROL"
+	Cryptography       TYPE = "CRYPTOGRAPHIC FAILURES"
+	MisConfiguration   TYPE = "SECURITY MISCONFIGURATION"
+	OutdatedComponents TYPE = "Outdated Components"
 )
 
 const (
@@ -22,12 +33,13 @@ const (
 	CrossSiteForgery  VULNERABILITY = "Cross-site Request Forgery" // low
 
 	// cyptographic failure
-	Certification VULNERABILITY = "SSL/TLS Not Implemented"             // medium
-	Transmittion  VULNERABILITY = "Personal data Transmitted over HTTP" // medium
+	Certification VULNERABILITY = "SSL/TLS Not Implemented"    // medium
+	Transmittion  VULNERABILITY = "Data Transmitted over HTTP" // medium
 
 	// security misconfiguration
-	PHPVersion   VULNERABILITY = "Version Disclosure (PHP)"   // low
-	NginxVersion VULNERABILITY = "Version Disclosure (Nginx)" // low
+	PHPVersion    VULNERABILITY = "Version Disclosure (PHP)"    // low
+	NginxVersion  VULNERABILITY = "Version Disclosure (Nginx)"  // low
+	ApacheVersion VULNERABILITY = "Version Disclosure (Apache)" // low
 
 	//
 )
@@ -45,4 +57,21 @@ const (
 	PHPSSRF                   VULNERABILITY = "PHP Server-Side Request Forgery (SSRF) Vulnerability (CVE-2017-7272)"
 	PHPThrottling             VULNERABILITY = "PHP Allocation of Resources Without Limits or Throttling Vulnerability (CVE-2017-7963)"
 	PHPResourceConsumption    VULNERABILITY = "PHP Uncontrolled Resource Consumption Vulnerability (CVE-2015-9253)" // low
+	
 )
+
+func PhpPwnCVE() string {
+	return fmt.Sprintf("%s\n%s\n%s\n%s\n%s\n%s\n%s\n%s\n%s\n%s\n%s\n",
+		PHPMemoryBuffer,
+		PHPValidation,
+		PHPNumericErrors,
+		PHPIntegerOrWraparound,
+		PHPAccessControls,
+		PHPAccessControl,
+		PHPNullPointerDereference,
+		PHPDeserialization,
+		PHPSSRF,
+		PHPThrottling,
+		PHPResourceConsumption,
+	)
+}
