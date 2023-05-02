@@ -15,7 +15,6 @@ type ReportBase struct {
 
 type Report struct {
 	URL               string `json:"url"`
-	RiskRate          int    `json:"risk_rate"`
 	SQLi              *Page  `json:"sqli,omitempty"`
 	LFI               *Page  `json:"lfi,omitempty"`
 	MConfig           *Page  `json:"miss_config,omitempty"`

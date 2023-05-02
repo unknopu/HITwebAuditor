@@ -36,3 +36,8 @@ func (f OutdatedComponentForm) URLOptions() *entities.OutdatedComponent {
 		ParameterValue: pValue,
 	}
 }
+
+type HttpHeader struct {
+	Server     string `json:"server"`
+	XPoweredBy string `json:"x_powered_by"`
+}

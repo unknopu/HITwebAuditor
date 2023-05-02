@@ -7,6 +7,8 @@ import (
 	cf "auditor/handlers/cryptograhpical_failure"
 	mc "auditor/handlers/miss_configuration"
 	odc "auditor/handlers/outdated_component"
+	xss "auditor/handlers/xss"
+
 	"strings"
 
 	"io/ioutil"
@@ -56,6 +58,18 @@ func (s Service) doOutdatedCpn(c *context.Context, ref []*entities.MissConfigura
 	}
 
 	report, err := s.odcs.Init(c, f)
+	if err != nil {
+		return nil
+	}
+
+	return report.(*entities.Page)
+}
+
+func (s Service) doXSS(c *context.Context, option *Form) *entities.Page {
+	f := &xss.XSSForm{}
+	_ = copier.Copy(f, option)
+
+	report, err := s.xsss.Init(c, f)
 	if err != nil {
 		return nil
 	}

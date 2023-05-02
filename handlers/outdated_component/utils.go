@@ -1,7 +1,10 @@
 package outdated_component
 
 import (
+	"auditor/core/utils"
 	"auditor/entities"
+	"log"
+	"net/http"
 	"strconv"
 	"strings"
 )
@@ -63,4 +66,24 @@ func isPhpPWN(version string) bool {
 		return false // Version is greater than 7.0.0
 	}
 	return true // Version is within the range 5.3.0 to 7.0.0
+}
+
+func fetchHeaders(option entities.OutdatedComponent) *HttpHeader {
+	http.DefaultTransport.(*http.Transport).TLSClientConfig = utils.C
+
+	client := &http.Client{}
+	r, _ := http.NewRequest(http.MethodGet, option.URL.String(), nil)
+
+	res, err := client.Do(r)
+	if err != nil {
+		log.Println("[*] GET HTML: ", err)
+	}
+	if res != nil {
+		defer res.Body.Close()
+	}
+
+	return &HttpHeader{
+		Server:     res.Header.Get("Server"),
+		XPoweredBy: res.Header.Get("X-Powered-By"),
+	}
 }

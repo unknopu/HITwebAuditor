@@ -15,7 +15,7 @@ type XSS struct {
 type XSSReport struct {
 	Location       string          `json:"location,omitempty"`
 	Payload        []string        `json:"payload,omitempty"`
-	Level          []string        `json:"level,omitempty"`
+	Level          LEVEL           `json:"level,omitempty"`
 	Type           TYPE            `json:"type,omitempty"`
-	Vaulnerability []VULNERABILITY `json:"vaulnerability,omitempty"`
+	Vaulnerability VULNERABILITY `json:"vaulnerability,omitempty"`
 }

@@ -12,6 +12,37 @@ import (
 	"golang.org/x/net/html"
 )
 
+func buildPageInfomation(e []*entities.XSSReport) *entities.Page {
+	if len(e) <= 0 {
+		return nil
+	}
+
+	var low, medium, high, critical int
+
+	for _, r := range e {
+		switch r.Level {
+		case entities.LOW:
+			low += 1
+		case entities.MEDIUM:
+			medium += 1
+		case entities.HIGH:
+			high += 1
+		case entities.CRITICAL:
+			critical += 1
+		}
+	}
+
+	pif := &entities.PageInformation{
+		Vulnerabilities: len(e),
+		Low:             low,
+		Medium:          medium,
+		High:            high,
+		Critical:        critical,
+	}
+
+	return entities.NewPage(*pif, e)
+}
+
 func fetchTagBody(option entities.XSS, payload string) string {
 	http.DefaultTransport.(*http.Transport).TLSClientConfig = utils.C
 

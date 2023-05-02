@@ -36,6 +36,7 @@ func (s *Service) Init(c *context.Context, f *XSSForm) (interface{}, error) {
 	option := f.URLOptions()
 
 	var p []string
+	var reports []*entities.XSSReport
 	for _, payload := range payloads {
 		bodyTag := fetchTagBody(*option, payload)
 		if strings.ContainsAny(bodyTag, payload) {
@@ -46,13 +47,15 @@ func (s *Service) Init(c *context.Context, f *XSSForm) (interface{}, error) {
 		}
 	}
 
-	report := &entities.XSSReport{
-		Location:       f.URL,
-		Payload:        p,
-		Level:          []string{"High"},
-		Type:           entities.Injection,
-		Vaulnerability: []entities.VULNERABILITY{entities.CrossSiteScripting},
+	if len(p) > 0 {
+		reports = append(reports, &entities.XSSReport{
+			Location:       f.URL,
+			Payload:        p,
+			Level:          entities.HIGH,
+			Type:           entities.Injection,
+			Vaulnerability: entities.CrossSiteScripting,
+		})
 	}
 
-	return report, nil
+	return buildPageInfomation(reports), nil
 }

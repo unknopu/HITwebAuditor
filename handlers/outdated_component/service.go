@@ -3,6 +3,7 @@ package outdated_component
 import (
 	"auditor/app"
 	"auditor/core/context"
+	"auditor/core/utils"
 	"auditor/entities"
 	"strings"
 	"sync"
@@ -35,13 +36,24 @@ func NewService(c *app.Context) ServiceInterface {
 func (s *Service) Init(c *context.Context, f *OutdatedComponentForm) (interface{}, error) {
 	var reports []*entities.OutdatedComponentsReport
 
+	if len(f.Refer) == 0 {
+		option := f.URLOptions()
+		headerData := fetchHeaders(*option)
+		if headerData.Server != "" {
+			f.Refer = append(f.Refer, headerData.Server)
+		}
+		if headerData.XPoweredBy != "" {
+			f.Refer = append(f.Refer, headerData.XPoweredBy)
+		}
+	}
+
 	for _, ref := range f.Refer {
 		temp := strings.Split(ref, "/")
 		if len(temp) < 1 {
 			continue
 		}
 
-		if isPhpPWN(temp[1]) {
+		if isPhpPWN(temp[1]) && utils.IsExisting(temp[0], []string{"PHP", "php"}) {
 			v := entities.PhpPwnCVE()
 			reports = append(reports, &entities.OutdatedComponentsReport{
 				Location:       f.URL,
