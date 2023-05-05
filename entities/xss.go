@@ -13,9 +13,10 @@ type XSS struct {
 }
 
 type XSSReport struct {
-	Location       string          `json:"location,omitempty"`
-	Payload        []string        `json:"payload,omitempty"`
-	Level          LEVEL           `json:"level,omitempty"`
-	Type           TYPE            `json:"type,omitempty"`
+	mongodb.Model  `bson:",inline"`
+	Location       string        `json:"location,omitempty"`
+	Payload        []string      `json:"payload,omitempty"`
+	Level          LEVEL         `json:"level,omitempty"`
+	Type           TYPE          `json:"type,omitempty"`
 	Vaulnerability VULNERABILITY `json:"vaulnerability,omitempty"`
 }

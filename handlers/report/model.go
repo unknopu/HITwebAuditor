@@ -7,10 +7,6 @@ import (
 	"net/url"
 )
 
-const (
-	lfi = "Local File Inclusion"
-)
-
 type Form struct {
 	common.PageQuery
 	MethodRefer string `json:"mehod"`

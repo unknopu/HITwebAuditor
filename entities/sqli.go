@@ -24,9 +24,10 @@ type SQLi struct {
 }
 
 type SQLiReport struct {
-	Location       string          `json:"location,omitempty"`
-	Payload        []string        `json:"payload,omitempty"`
-	Level          []string        `json:"level,omitempty"`
-	Type           TYPE            `json:"type,omitempty"`
-	Vaulnerability []VULNERABILITY `json:"vaulnerability,omitempty"`
+	mongodb.Model  `bson:",inline"`
+	Location       string        `json:"location,omitempty"`
+	Payload        []string      `json:"payload,omitempty"`
+	Level          LEVEL         `json:"level,omitempty"`
+	Type           TYPE          `json:"type,omitempty"`
+	Vaulnerability VULNERABILITY `json:"vaulnerability,omitempty"`
 }

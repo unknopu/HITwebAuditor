@@ -4,6 +4,7 @@ import (
 	"auditor/app"
 	"auditor/core/context"
 	"auditor/entities"
+	"log"
 	"regexp"
 	"sync"
 )
@@ -33,6 +34,7 @@ func NewService(c *app.Context) ServiceInterface {
 }
 
 func (s *Service) Init(c *context.Context, f *LFIForm) (interface{}, error) {
+	var reports []*entities.LFIReport
 	option := f.URLOptions()
 
 	var p []string
@@ -46,17 +48,18 @@ func (s *Service) Init(c *context.Context, f *LFIForm) (interface{}, error) {
 		}
 
 		if isMatch {
+			log.Println("MATCH: ", payload)
 			p = append(p, payload)
+			reports = append(reports, &entities.LFIReport{
+				Location:       f.URL,
+				Payload:        p,
+				Level:          entities.HIGH,
+				Type:           entities.Broken,
+				Vaulnerability: entities.LocalFileIncusion,
+			})
+			break
 		}
 	}
 
-	report := &entities.LFIReport{
-		Location:       f.URL,
-		Payload:        p,
-		Level:          []string{"High"},
-		Type:           entities.Broken,
-		Vaulnerability: []entities.VULNERABILITY{entities.LocalFileIncusion},
-	}
-
-	return report, nil
+	return buildPageInfomation(reports), nil
 }

@@ -4,7 +4,6 @@ import (
 	"auditor/app"
 	"auditor/core/context"
 	"auditor/entities"
-	"errors"
 	"sync"
 )
 
@@ -33,17 +32,38 @@ func NewService(c *app.Context) ServiceInterface {
 }
 
 func (s *Service) Init(c *context.Context, f *SqliForm) (interface{}, error) {
+	var reports []*entities.SQLiReport
 	option := f.URLOptions()
-	IsPwn := tryInjection(*option)
+	isInjectable, body := isParamInjectable(*option)
+	isErrMsgDetected := detectErrMsg(body)
 
-	if IsPwn {
-		return &entities.SQLiReport{
-			Location:       f.URL,
-			Level:          []string{"Critical"},
-			Type:           entities.Injection,
-			Vaulnerability: []entities.VULNERABILITY{entities.SQLIboolean},
-		}, nil
+	if isInjectable {
+		if isErrMsgDetected {
+			reports = append(reports, &entities.SQLiReport{
+				Location:       f.URL,
+				Level:          entities.CRITICAL,
+				Type:           entities.Injection,
+				Vaulnerability: entities.SQLIErr,
+			})
+		}
+		if isContainBooleanBased(*option) {
+			reports = append(reports, &entities.SQLiReport{
+				Location:       f.URL,
+				Level:          entities.CRITICAL,
+				Type:           entities.Injection,
+				Vaulnerability: entities.SQLIboolean,
+			})
+		}
 	}
 
-	return nil, errors.New("not found")
+	if isContainUnionBased(*option) {
+		reports = append(reports, &entities.SQLiReport{
+			Location:       f.URL,
+			Level:          entities.CRITICAL,
+			Type:           entities.Injection,
+			Vaulnerability: entities.SQLIUnion,
+		})
+	}
+
+	return buildPageInfomation(reports), nil
 }

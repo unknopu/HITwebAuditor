@@ -24,6 +24,8 @@ const (
 const (
 	// sql injection
 	SQLIboolean VULNERABILITY = "Boolean Based SQL Injection" // critical
+	SQLIErr     VULNERABILITY = "Error Based SQL Injection"   // critical
+	SQLIUnion   VULNERABILITY = "Union Based SQL Injection"   // critical
 
 	// xss
 	CrossSiteScripting VULNERABILITY = "Cross-site Scripting" // hihg
@@ -57,7 +59,7 @@ const (
 	PHPSSRF                   VULNERABILITY = "PHP Server-Side Request Forgery (SSRF) Vulnerability (CVE-2017-7272)"
 	PHPThrottling             VULNERABILITY = "PHP Allocation of Resources Without Limits or Throttling Vulnerability (CVE-2017-7963)"
 	PHPResourceConsumption    VULNERABILITY = "PHP Uncontrolled Resource Consumption Vulnerability (CVE-2015-9253)" // low
-	
+
 )
 
 func PhpPwnCVE() string {

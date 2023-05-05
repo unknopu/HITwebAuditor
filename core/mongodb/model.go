@@ -8,11 +8,11 @@ import (
 
 // Model common mongodb model
 type Model struct {
-	ID        primitive.ObjectID `json:"id" bson:"_id,omitempty"`
-	DeletedAt *time.Time         `json:"-" bson:"deleted_at,omitempty"`
-	DeletedBy primitive.ObjectID `json:"-" bson:"deleted_by,omitempty"`
-	UpdatedAt *time.Time         `json:"updated_at,omitempty" bson:"updated_at,omitempty"`
-	CreatedAt time.Time          `json:"created_at" bson:"created_at,omitempty"`
+	ID        *primitive.ObjectID `json:"id,omitempty" bson:"_id,omitempty"`
+	DeletedAt *time.Time          `json:"-" bson:"deleted_at,omitempty"`
+	DeletedBy primitive.ObjectID  `json:"-" bson:"deleted_by,omitempty"`
+	UpdatedAt *time.Time          `json:"updated_at,omitempty" bson:"updated_at,omitempty"`
+	CreatedAt *time.Time          `json:"created_at,omitempty" bson:"created_at,omitempty"`
 }
 
 // ModelInterface model interface
@@ -26,19 +26,19 @@ type ModelInterface interface {
 
 // SetID set id
 func (model *Model) SetID(id primitive.ObjectID) {
-	model.ID = id
+	model.ID = &id
 }
 
 // GetID get id
 func (model *Model) GetID() primitive.ObjectID {
-	return model.ID
+	return *model.ID
 }
 
 // Stamp current time to model
 func (model *Model) Stamp() {
 	timeNow := time.Now()
 	model.UpdatedAt = &timeNow
-	model.CreatedAt = timeNow
+	model.CreatedAt = &timeNow
 }
 
 // UpdateStamp current updated at model
@@ -46,7 +46,7 @@ func (model *Model) UpdateStamp() {
 	timeNow := time.Now()
 	model.UpdatedAt = &timeNow
 	if model.CreatedAt.IsZero() {
-		model.CreatedAt = timeNow
+		model.CreatedAt = &timeNow
 	}
 }
 

@@ -5,8 +5,10 @@ import (
 	"auditor/core/utils"
 	"auditor/entities"
 	cf "auditor/handlers/cryptograhpical_failure"
+	lfi "auditor/handlers/lfi"
 	mc "auditor/handlers/miss_configuration"
 	odc "auditor/handlers/outdated_component"
+	sqli "auditor/handlers/sqli"
 	xss "auditor/handlers/xss"
 
 	"strings"
@@ -70,6 +72,30 @@ func (s Service) doXSS(c *context.Context, option *Form) *entities.Page {
 	_ = copier.Copy(f, option)
 
 	report, err := s.xsss.Init(c, f)
+	if err != nil {
+		return nil
+	}
+
+	return report.(*entities.Page)
+}
+
+func (s Service) doSQLI(c *context.Context, option *Form) *entities.Page {
+	f := &sqli.SqliForm{}
+	_ = copier.Copy(f, option)
+
+	report, err := s.sqlis.Init(c, f)
+	if err != nil {
+		return nil
+	}
+
+	return report.(*entities.Page)
+}
+
+func (s Service) doLFI(c *context.Context, option *Form) *entities.Page {
+	f := &lfi.LFIForm{}
+	_ = copier.Copy(f, option)
+
+	report, err := s.lfis.Init(c, f)
 	if err != nil {
 		return nil
 	}

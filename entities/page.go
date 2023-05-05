@@ -2,12 +2,17 @@ package entities
 
 // PageInformation page information
 type PageInformation struct {
-	Vulnerabilities int `json:"total_number_of_vulnerability"`
-	Low             int `json:"total_number_of_low"`
-	Medium          int `json:"total_number_of_medium"`
-	High            int `json:"total_number_of_high"`
-	Critical        int `json:"total_number_of_critical"`
-	RiskRate        int `json:"risk_rate"`
+	Vulnerabilities    int  `json:"total_number_of_vulnerability"`
+	Low                int  `json:"total_number_of_low"`
+	Medium             int  `json:"total_number_of_medium"`
+	High               int  `json:"total_number_of_high"`
+	Critical           int  `json:"total_number_of_critical"`
+	RiskRate           int  `json:"risk_rate"`
+	Injection          *int `json:"type_injection,omitempty"`
+	Broken             *int `json:"type_broken_access_control,omitempty"`
+	Cryptography       *int `json:"type_crypto_failure,omitempty"`
+	MisConfiguration   *int `json:"type_miss_configuration,omitempty"`
+	OutdatedComponents *int `json:"type_outdated_components,omitempty"`
 }
 
 // Page page model

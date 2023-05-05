@@ -25,6 +25,7 @@ func (f SqliForm) URLOptions() *entities.SQLi {
 	queries, _ := url.ParseQuery(webURL.RawQuery)
 	p, pValue := utils.FetchParam(queries, f.Param)
 
+	// log.Println("url origin: ", webURL, p, pValue)
 	return &entities.SQLi{
 		URL:            webURL,
 		PageOrigin:     utils.GetPageHTML(webURL.String(), f.Cookie),

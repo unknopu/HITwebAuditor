@@ -13,6 +13,7 @@ type OutdatedComponent struct {
 }
 
 type OutdatedComponentsReport struct {
+	mongodb.Model  `bson:",inline"`
 	Location       string        `json:"location,omitempty"`
 	Payload        []string      `json:"payload,omitempty"`
 	Level          LEVEL         `json:"level,omitempty"`
