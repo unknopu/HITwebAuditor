@@ -56,7 +56,11 @@ func main() {
 	}
 	err = mongodb.InitDatabase(mongodbOptions)
 	if err != nil {
-		panic(err)
+		// panic(err)
+		fmt.Println(
+			fmt.Sprintf("%v database unconnectable", time.Now().Format("2023/05/08 14:21:50")),
+		)
+
 	}
 
 	context := app.NewContext(envConfig)

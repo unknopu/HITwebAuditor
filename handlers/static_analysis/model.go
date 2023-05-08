@@ -7,8 +7,8 @@ import (
 
 type StaticAnalysisForm struct {
 	common.PageQuery
-	URL  string          `json:"url"`
-	File *multipart.File `json:"file"`
+	URL  *string         `json:"url" form:"url"`
+	File *multipart.File `json:"file" form:"file"`
 }
 
 // func (f SqliForm) URLOptions() *entities.SQLi {

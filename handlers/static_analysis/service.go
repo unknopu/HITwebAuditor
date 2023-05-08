@@ -2,8 +2,12 @@ package static_analysis
 
 import (
 	"auditor/app"
-	"auditor/core/context"
+	"fmt"
+	"strings"
 	"sync"
+	"text/scanner"
+
+	"github.com/labstack/echo/v4"
 )
 
 var (
@@ -13,7 +17,7 @@ var (
 
 // ServiceInterface service interface
 type ServiceInterface interface {
-	Init(c *context.Context, f *StaticAnalysisForm) (interface{}, error)
+	Init(c echo.Context, f *StaticAnalysisForm) (interface{}, error)
 }
 
 // Service  repo
@@ -30,7 +34,21 @@ func NewService(c *app.Context) ServiceInterface {
 	}
 }
 
-func (s *Service) Init(c *context.Context, f *StaticAnalysisForm) (interface{}, error) {
+func (s *Service) Init(c echo.Context, f *StaticAnalysisForm) (interface{}, error) {
+	content, err := fileContent(c)
+	if err != nil {
+		return nil, err
+	}
 
-	return nil, nil
+	return content, nil
+}
+
+func lexicalAnalysis(phpCode string) {
+	var s scanner.Scanner
+	s.Init(strings.NewReader(phpCode))
+	s.Filename = "example.php"
+
+	for tok := s.Scan(); tok != scanner.EOF; tok = s.Scan() {
+		fmt.Printf("Token: %s\tValue: %s\tPosition: %s\n", s.TokenText(), scanner.TokenString(tok), s.Pos())
+	}
 }
