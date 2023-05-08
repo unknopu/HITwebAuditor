@@ -17,6 +17,7 @@ import (
 	"auditor/env"
 	cf "auditor/handlers/cryptograhpical_failure"
 	odc "auditor/handlers/outdated_component"
+	sa "auditor/handlers/static_analysis"
 
 	"auditor/handlers/lfi"
 	"auditor/handlers/me"
@@ -118,6 +119,7 @@ func NewWithOptions(options *Options, context *app.Context) *echo.Echo {
 	MissConfigHandler := mc.NewHandler(context)
 	CFHandler := cf.NewHandler(context)
 	OutdatedHandler := odc.NewHandler(context)
+	StaticAnalysisHandler := sa.NewHandler(context)
 
 	meGroup := api.Group("/me")
 	{
@@ -129,6 +131,11 @@ func NewWithOptions(options *Options, context *app.Context) *echo.Echo {
 	ReportGroup := api.Group("/report")
 	{
 		ReportGroup.POST("", ReportHandler.Init)
+	}
+
+	StaticAnalysisGroup := api.Group("/sa")
+	{
+		StaticAnalysisGroup.POST("", StaticAnalysisHandler.Init)
 	}
 
 	CFGroup := api.Group("/cf")
