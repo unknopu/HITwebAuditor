@@ -5,6 +5,7 @@ import (
 	"io/ioutil"
 	"log"
 	"net/http"
+	"regexp"
 )
 
 var (
@@ -37,4 +38,9 @@ func GetPageHTML(pageURL, cookie string) string {
 func GetPageLength(pageURL, cookie string) int {
 	html := GetPageHTML(pageURL, cookie)
 	return len(html)
+}
+
+func ISContainsHTMLBody(htmlString string) bool {
+	re := regexp.MustCompile(`(?i)<body[^>]*>.*<\/body>`)
+	return re.MatchString(htmlString)
 }
