@@ -1,14 +1,15 @@
 package static_analysis
 
 import (
+	"auditor/core/utils"
 	"auditor/entities"
 	"io"
 	"io/ioutil"
 	"log"
 	"os"
+	"regexp"
 
 	"github.com/labstack/echo/v4"
-
 )
 
 func buildPageInfomation(e []*entities.SQLiReport) *entities.Page {
@@ -42,6 +43,19 @@ func buildPageInfomation(e []*entities.SQLiReport) *entities.Page {
 	return entities.NewPage(*pif, e)
 }
 
+func fetchSourceCode(c echo.Context, f *StaticAnalysisForm) (string, error) {
+	if f.URL != nil {
+		return utils.GetPageHTML(*f.URL, ""), nil
+	}
+
+	content, err := fileContent(c)
+	if err != nil {
+		return "", err
+	}
+
+	return content, nil
+}
+
 func fileContent(c echo.Context) (string, error) {
 	file, err := c.FormFile("file")
 	if err != nil {
@@ -71,4 +85,20 @@ func fileContent(c echo.Context) (string, error) {
 	}
 
 	return string(content), nil
+}
+
+func validatePHPSource(content string) string {
+	re := regexp.MustCompile(`(?s)<\?php(.*?)\?>`)
+
+	// var sourceCode string
+	if re.MatchString(content) {
+		// 	matches := re.FindAllStringSubmatch(string(content), -1)
+		// 	for _, match := range matches {
+		// 		sourceCode += match[1]
+		// 	}
+		return content
+	}
+
+	return ""
+	// return strings.Trim(sourceCode, "\n")
 }
