@@ -47,12 +47,18 @@ func (s *Service) Init(c *context.Context, f *XSSForm) (interface{}, error) {
 	}
 
 	var p []string
+	var payloadSpliter string
 	for _, payload := range payloads {
 		bodyTag := fetchTagBody(*option, payload)
 		if strings.ContainsAny(bodyTag, payload) {
+			if strings.Contains(payload, payloadSpliter) && payloadSpliter != "" {
+				continue
+			}
+
 			p = append(p, payload)
+			payloadSpliter = payload[0:4]
 		}
-		if len(p) > 5 {
+		if len(p) > 3 {
 			break
 		}
 	}
