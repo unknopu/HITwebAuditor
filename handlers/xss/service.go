@@ -3,7 +3,9 @@ package xss
 import (
 	"auditor/app"
 	"auditor/core/context"
+	"auditor/core/utils"
 	"auditor/entities"
+	"log"
 	"strings"
 	"sync"
 )
@@ -35,8 +37,16 @@ func NewService(c *app.Context) ServiceInterface {
 func (s *Service) Init(c *context.Context, f *XSSForm) (interface{}, error) {
 	option := f.URLOptions()
 
-	var p []string
 	var reports []*entities.XSSReport
+	testMsg := utils.RandomString(10)
+	bodyTag := fetchTagBody(*option, testMsg)
+
+	if !strings.ContainsAny(bodyTag, testMsg) {
+		log.Println("test msg failure: ", testMsg)
+		return reports, nil
+	}
+
+	var p []string
 	for _, payload := range payloads {
 		bodyTag := fetchTagBody(*option, payload)
 		if strings.ContainsAny(bodyTag, payload) {
