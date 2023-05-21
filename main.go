@@ -60,23 +60,22 @@ func main() {
 	}
 
 	context := app.NewContext(envConfig)
-	// if os.Getenv("RedisOn") != "" {
-	client := redis.NewClient(&redis.Options{
-		Addr:     envConfig.RedisHost,
-		Password: envConfig.RedisPassword,
-	})
-	ctx, cancel := cc.WithTimeout(cc.Background(), 2*time.Second)
-	defer cancel()
-	err = client.Ping(ctx).Err()
-	if err != nil {
-		panic(err)
+	if os.Getenv("RedisOn") != "" {
+		client := redis.NewClient(&redis.Options{
+			Addr:     envConfig.RedisHost,
+			Password: envConfig.RedisPassword,
+		})
+		ctx, cancel := cc.WithTimeout(cc.Background(), 2*time.Second)
+		defer cancel()
+		err = client.Ping(ctx).Err()
+		if err != nil {
+			panic(err)
+		}
+		context.RedisClient = client
+		locker := redislock.New(client)
+		context.RedisLock = locker
+		fmt.Println("redishost at: ", envConfig.RedisHost)
 	}
-	context.RedisClient = client
-	locker := redislock.New(client)
-	context.RedisLock = locker
-	fmt.Println("redishost at: ", envConfig.RedisHost)
-
-	// }
 
 	options := &router.Options{
 		Environment: envConfig,
