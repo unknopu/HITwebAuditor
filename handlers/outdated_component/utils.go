@@ -9,7 +9,7 @@ import (
 	"strings"
 )
 
-func buildPageInfomation(e []*entities.OutdatedComponentsReport) *entities.Page {
+func BuildPageInfomation(e []*entities.OutdatedComponentsReport) *entities.Page {
 	if len(e) <= 0 {
 		return nil
 	}

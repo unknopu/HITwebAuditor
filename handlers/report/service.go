@@ -10,7 +10,10 @@ import (
 	odc "auditor/handlers/outdated_component"
 	sqli "auditor/handlers/sqli"
 	xss "auditor/handlers/xss"
+	"log"
 	"sync"
+
+	"github.com/go-redis/redis/v8"
 )
 
 var (
@@ -21,6 +24,7 @@ var (
 // ServiceInterface service interface
 type ServiceInterface interface {
 	Init(c *context.Context, f *Form) (interface{}, error)
+	GetLatest(c *context.Context, f *GetLatestForm) (interface{}, error)
 }
 
 // Service  repo
@@ -33,6 +37,7 @@ type Service struct {
 	xsss    xss.ServiceInterface
 	lfis    lfi.ServiceInterface
 	sqlis   sqli.ServiceInterface
+	cache   *redis.Client
 }
 
 // NewService new service
@@ -46,46 +51,92 @@ func NewService(c *app.Context) ServiceInterface {
 		xsss:    xss.NewService(c),
 		lfis:    lfi.NewService(c),
 		sqlis:   sqli.NewService(c),
+		cache:   c.RedisClient,
 	}
 }
 
 func (s *Service) Init(c *context.Context, f *Form) (interface{}, error) {
+	report := &entities.Report{URL: f.URL}
+	err := s.rp.Create(report)
+	if err != nil {
+		return nil, err
+	}
+	f.ReportNumber = *report.ID
+
 	// option := f.URLOptions()
-	var missConfigVul, outdatedCpnVul, cryptoFailureVul, xssVul, lfiVul, sqliVul *entities.Page
+	// var missConfigVul, outdatedCpnVul, cryptoFailureVul, xssVul, lfiVul, sqliVul *entities.Page
 	wg.Add(5)
 
 	go func() {
-		missConfigVul = s.doMissConfig(c, f)
+		missConfigVul := s.doMissConfig(c, f)
 		if missConfigVul != nil {
-			outdatedCpnVul = s.doOutdatedCpn(c, missConfigVul.Entities.([]*entities.MissConfigurationReport))
+			_ = s.doOutdatedCpn(c, missConfigVul, *report.ID)
 		}
 		wg.Done()
 	}()
 	go func() {
-		cryptoFailureVul = s.doCryptoFailure(c, f)
+		_ = s.doCryptoFailure(c, f)
 		wg.Done()
 	}()
 	go func() {
-		xssVul = s.doXSS(c, f)
+		_ = s.doXSS(c, f)
 		wg.Done()
 	}()
 	go func() {
-		lfiVul = s.doLFI(c, f)
+		_ = s.doLFI(c, f)
 		wg.Done()
 	}()
 	go func() {
-		sqliVul = s.doSQLI(c, f)
+		_ = s.doSQLI(c, f)
 		wg.Done()
 	}()
 	wg.Wait()
-	
-	return &entities.Report{
-		URL:               f.URL,
-		MConfig:           missConfigVul,
-		CryptoFailure:     cryptoFailureVul,
-		OutdatedComponent: outdatedCpnVul,
-		XSS:               xssVul,
-		LFI:               lfiVul,
-		SQLi:              sqliVul,
-	}, nil
+
+	// report := &entities.Report{
+	// 	URL:               f.URL,
+	// 	MConfig:           missConfigVul,
+	// 	CryptoFailure:     cryptoFailureVul,
+	// 	OutdatedComponent: outdatedCpnVul,
+	// 	XSS:               xssVul,
+	// 	LFI:               lfiVul,
+	// 	SQLi:              sqliVul,
+	// }
+
+	// _ = s.doSQLI(c, f)
+	// smf := s.doMissConfig(c, f)
+	// _ = s.doOutdatedCpn(c, smf, f.ReportNumber)
+	// _ = s.doXSS(c, f)
+	// _ = s.doCryptoFailure(c, f)
+	// _ = s.doLFI(c, f)
+
+	// report := &entities.Report{
+	// 	URL:  f.URL,
+	// 	SQLi: sqliVul,
+	// }
+
+	return nil, nil
+}
+
+func (s *Service) GetLatest(c *context.Context, f *GetLatestForm) (interface{}, error) {
+
+	log.Println("init fetching... ")
+	report, err := s.rp.FindLatest()
+	if err != nil {
+		return nil, err
+	}
+
+	sqli := s.fetchSQLI(c, *report.ID)
+	secMissCon := s.fetchSecMissCon(c, *report.ID)
+	outDateComponents := s.fetchOutdatedCpn(c, *report.ID)
+	xss := s.fetchXSS(c, *report.ID)
+	cryptoFailure := s.fetchCryptoFailure(c, *report.ID)
+	lfi := s.fetchLFI(c, *report.ID)
+
+	report.SQLi = sqli
+	report.MConfig = secMissCon
+	report.OutdatedComponent = outDateComponents
+	report.XSS = xss
+	report.CryptoFailure = cryptoFailure
+	report.LFI = lfi
+	return report, nil
 }

@@ -2,12 +2,15 @@ package report
 
 import (
 	"auditor/core/mongodb"
+	"auditor/entities"
 
+	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
+	"go.mongodb.org/mongo-driver/mongo/options"
 )
 
 const (
-	collectionName = "lfi"
+	collectionName = "report"
 )
 
 // RepoInterface repo interface
@@ -15,8 +18,8 @@ type RepoInterface interface {
 	Create(i interface{}) error
 	Update(i interface{}) error
 	Delete(i interface{}) error
-	FindOneByID(id string, i interface{}) error
-	FindOneByPrimitiveM(m primitive.M, i interface{}) error
+	FindLatest() (*entities.Report, error)
+	FindAllByPrimitiveM(m primitive.M, result interface{}, opts ...*options.FindOptions) error
 }
 
 // Repo otp repo
@@ -33,4 +36,17 @@ func NewRepo() *Repo {
 				Collection(collectionName),
 		},
 	}
+}
+
+func (r *Repo) FindLatest() (*entities.Report, error) {
+	entity := []*entities.Report{}
+	o := options.
+		Find().
+		SetSort(bson.D{{"updated_at", -1}})
+	err := r.FindAllByPrimitiveM(primitive.M{}, &entity, o)
+	if err != nil {
+		return nil, err
+	}
+
+	return entity[0], nil
 }

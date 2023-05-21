@@ -4,7 +4,7 @@ import (
 	"auditor/entities"
 )
 
-func buildPageInfomation(e []*entities.CryptoFailureReport) *entities.Page {
+func BuildPageInfomation(e []*entities.CryptoFailureReport) *entities.Page {
 	if len(e) <= 0 {
 		return nil
 	}

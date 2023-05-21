@@ -5,15 +5,18 @@ import (
 	"auditor/entities"
 	"auditor/handlers/common"
 	"net/url"
+
+	"go.mongodb.org/mongo-driver/bson/primitive"
 )
 
 type Form struct {
 	common.PageQuery
-	MethodRefer string `json:"mehod"`
-	URL         string `json:"url"`
-	Param       string `json:"param"`
-	Cookie      string `json:"cookie"`
-	JWT         string `json:"jwt"`
+	MethodRefer  string             `json:"mehod"`
+	URL          string             `json:"url"`
+	Param        string             `json:"param"`
+	Cookie       string             `json:"cookie"`
+	JWT          string             `json:"jwt"`
+	ReportNumber primitive.ObjectID `json:"-"`
 }
 
 func (f Form) URLOptions() *entities.ReportBase {
@@ -30,4 +33,8 @@ func (f Form) URLOptions() *entities.ReportBase {
 		Parameter:      p,
 		ParameterValue: pValue,
 	}
+}
+
+type GetLatestForm struct {
+	common.PageQuery
 }

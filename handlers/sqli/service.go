@@ -5,6 +5,8 @@ import (
 	"auditor/core/context"
 	"auditor/entities"
 	"sync"
+
+	"go.mongodb.org/mongo-driver/bson/primitive"
 )
 
 var (
@@ -14,7 +16,8 @@ var (
 
 // ServiceInterface service interface
 type ServiceInterface interface {
-	Init(c *context.Context, f *SqliForm) (interface{}, error)
+	Init(c *context.Context, f *SqliForm) ([]*entities.SQLiReport, error)
+	FetchReport(c *context.Context, id primitive.ObjectID) (*entities.Page, error)
 }
 
 // Service  repo
@@ -31,7 +34,7 @@ func NewService(c *app.Context) ServiceInterface {
 	}
 }
 
-func (s *Service) Init(c *context.Context, f *SqliForm) (interface{}, error) {
+func (s *Service) Init(c *context.Context, f *SqliForm) ([]*entities.SQLiReport, error) {
 	var reports []*entities.SQLiReport
 	option := f.URLOptions()
 	isInjectable, body := isParamInjectable(*option)
@@ -78,5 +81,24 @@ func (s *Service) Init(c *context.Context, f *SqliForm) (interface{}, error) {
 	}()
 	wg.Wait()
 
-	return buildPageInfomation(reports), nil
+	for index, _ := range reports {
+		reports[index].ReportNumber = f.ReportNumber
+	}
+
+	err := s.rp.Create(reports)
+	if err != nil {
+		return nil, err
+	}
+	return reports, nil
+}
+
+func (s *Service) FetchReport(c *context.Context, id primitive.ObjectID) (*entities.Page, error) {
+	reports := []*entities.SQLiReport{}
+	err := s.rp.FindAllByPrimitiveM(primitive.M{"report_number": id}, &reports)
+	if err != nil {
+		return nil, err
+	}
+
+	return BuildPageInfomation(reports), nil
+
 }

@@ -5,15 +5,18 @@ import (
 	"auditor/entities"
 	"auditor/handlers/common"
 	"net/url"
+
+	"go.mongodb.org/mongo-driver/bson/primitive"
 )
 
 type XSSForm struct {
 	common.PageQuery
-	MethodRefer string `json:"mehod"`
-	URL         string `json:"url"`
-	Param       string `json:"param"`
-	Cookie      string `json:"cookie"`
-	JWT         string `json:"jwt"`
+	MethodRefer  string             `json:"mehod"`
+	URL          string             `json:"url"`
+	Param        string             `json:"param"`
+	Cookie       string             `json:"cookie"`
+	JWT          string             `json:"jwt"`
+	ReportNumber primitive.ObjectID `json:"-"`
 }
 
 func (f XSSForm) URLOptions() *entities.XSS {

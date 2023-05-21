@@ -12,6 +12,7 @@ import (
 // Interface me interface
 type Interface interface {
 	Init(c echo.Context) error
+	GetLatest(c echo.Context) error
 }
 
 // Handler me handler
@@ -34,6 +35,19 @@ func (h *Handler) Init(c echo.Context) error {
 		return err
 	}
 	u, err := h.ms.Init(cc, f)
+	if err != nil {
+		return err
+	}
+	return c.JSON(http.StatusOK, u)
+}
+
+func (h *Handler) GetLatest(c echo.Context) error {
+	cc := c.(*context.Context)
+	f := &GetLatestForm{}
+	if err := c.(*context.Context).BindAndValidate(f); err != nil {
+		return err
+	}
+	u, err := h.ms.GetLatest(cc, f)
 	if err != nil {
 		return err
 	}

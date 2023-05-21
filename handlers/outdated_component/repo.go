@@ -4,10 +4,11 @@ import (
 	"auditor/core/mongodb"
 
 	"go.mongodb.org/mongo-driver/bson/primitive"
+	"go.mongodb.org/mongo-driver/mongo/options"
 )
 
 const (
-	collectionName = "lfi"
+	collectionName = "out_date_components"
 )
 
 // RepoInterface repo interface
@@ -17,6 +18,7 @@ type RepoInterface interface {
 	Delete(i interface{}) error
 	FindOneByID(id string, i interface{}) error
 	FindOneByPrimitiveM(m primitive.M, i interface{}) error
+	FindAllByPrimitiveM(m primitive.M, result interface{}, opts ...*options.FindOptions) error
 }
 
 // Repo otp repo

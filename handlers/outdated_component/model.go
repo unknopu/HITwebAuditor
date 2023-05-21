@@ -5,6 +5,8 @@ import (
 	"auditor/entities"
 	"auditor/handlers/common"
 	"net/url"
+
+	"go.mongodb.org/mongo-driver/bson/primitive"
 )
 
 const (
@@ -13,12 +15,13 @@ const (
 
 type OutdatedComponentForm struct {
 	common.PageQuery
-	MethodRefer string   `json:"mehod"`
-	URL         string   `json:"url"`
-	Param       string   `json:"param"`
-	Cookie      string   `json:"cookie"`
-	JWT         string   `json:"jwt"`
-	Refer       []string `json:"-"`
+	MethodRefer  string             `json:"mehod"`
+	URL          string             `json:"url"`
+	Param        string             `json:"param"`
+	Cookie       string             `json:"cookie"`
+	JWT          string             `json:"jwt"`
+	Refer        []string           `json:"-"`
+	ReportNumber primitive.ObjectID `json:"-"`
 }
 
 func (f OutdatedComponentForm) URLOptions() *entities.OutdatedComponent {

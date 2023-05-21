@@ -8,7 +8,7 @@ import (
 	"net/http"
 )
 
-func buildPageInfomation(e []*entities.LFIReport) *entities.Page {
+func BuildPageInfomation(e []*entities.LFIReport) *entities.Page {
 	if len(e) <= 0 {
 		return nil
 	}

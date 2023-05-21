@@ -7,7 +7,7 @@ import (
 	"net/http"
 )
 
-func buildPageInfomation(e []*entities.MissConfigurationReport) *entities.Page {
+func BuildPageInfomation(e []*entities.MissConfigurationReport) *entities.Page {
 	if len(e) <= 0 {
 		return nil
 	}

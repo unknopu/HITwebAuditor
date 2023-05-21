@@ -56,29 +56,27 @@ func main() {
 	}
 	err = mongodb.InitDatabase(mongodbOptions)
 	if err != nil {
-		// panic(err)
-		fmt.Println(
-			fmt.Sprintf("%v database unconnectable", time.Now().Format("2023/05/08 14:21:50")),
-		)
-
+		panic(err)
 	}
 
 	context := app.NewContext(envConfig)
-	if os.Getenv("RedisOn") != "" {
-		client := redis.NewClient(&redis.Options{
-			Addr:     envConfig.RedisHost,
-			Password: envConfig.RedisPassword,
-		})
-		ctx, cancel := cc.WithTimeout(cc.Background(), 2*time.Second)
-		defer cancel()
-		err = client.Ping(ctx).Err()
-		if err != nil {
-			panic(err)
-		}
-		context.RedisClient = client
-		locker := redislock.New(client)
-		context.RedisLock = locker
+	// if os.Getenv("RedisOn") != "" {
+	client := redis.NewClient(&redis.Options{
+		Addr:     envConfig.RedisHost,
+		Password: envConfig.RedisPassword,
+	})
+	ctx, cancel := cc.WithTimeout(cc.Background(), 2*time.Second)
+	defer cancel()
+	err = client.Ping(ctx).Err()
+	if err != nil {
+		panic(err)
 	}
+	context.RedisClient = client
+	locker := redislock.New(client)
+	context.RedisLock = locker
+	fmt.Println("redishost at: ", envConfig.RedisHost)
+
+	// }
 
 	options := &router.Options{
 		Environment: envConfig,
@@ -138,4 +136,9 @@ func initConfigFile() {
 	dport := fmt.Sprintf("SERVER_PORT: :8000\n")
 	_, _ = configs.WriteString(dport)
 
+	dr1 := fmt.Sprintf("REDIS_HOST: %v\n", os.Getenv("REDIS_HOST"))
+	_, _ = configs.WriteString(dr1)
+
+	dr2 := fmt.Sprintf("REDIS_PASSWORD: %v\n", os.Getenv("REDIS_PASSWORD"))
+	_, _ = configs.WriteString(dr2)
 }

@@ -12,7 +12,7 @@ import (
 	"golang.org/x/net/html"
 )
 
-func buildPageInfomation(e []*entities.XSSReport) *entities.Page {
+func BuildPageInfomation(e []*entities.XSSReport) *entities.Page {
 	if len(e) <= 0 {
 		return nil
 	}

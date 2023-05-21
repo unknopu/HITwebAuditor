@@ -7,6 +7,8 @@ import (
 	"log"
 	"regexp"
 	"sync"
+
+	"go.mongodb.org/mongo-driver/bson/primitive"
 )
 
 var (
@@ -16,7 +18,8 @@ var (
 
 // ServiceInterface service interface
 type ServiceInterface interface {
-	Init(c *context.Context, f *LFIForm) (interface{}, error)
+	Init(c *context.Context, f *LFIForm) ([]*entities.LFIReport, error)
+	FetchReport(c *context.Context, id primitive.ObjectID) (*entities.Page, error)
 }
 
 // Service  repo
@@ -33,7 +36,7 @@ func NewService(c *app.Context) ServiceInterface {
 	}
 }
 
-func (s *Service) Init(c *context.Context, f *LFIForm) (interface{}, error) {
+func (s *Service) Init(c *context.Context, f *LFIForm) ([]*entities.LFIReport, error) {
 	var reports []*entities.LFIReport
 	option := f.URLOptions()
 
@@ -61,5 +64,33 @@ func (s *Service) Init(c *context.Context, f *LFIForm) (interface{}, error) {
 		}
 	}
 
-	return buildPageInfomation(reports), nil
+	for index, _ := range reports {
+		reports[index].ReportNumber = f.ReportNumber
+	}
+
+	err := s.rp.Create(reports)
+	if err != nil {
+		return nil, err
+	}
+
+	log.Println()
+	log.Println(len(reports))
+	log.Println(len(reports))
+	log.Println(len(reports))
+	log.Println(len(reports))
+	log.Println(len(reports))
+	log.Println(len(reports))
+	log.Println(len(reports))
+	log.Println()
+
+	return reports, nil
+}
+
+func (s *Service) FetchReport(c *context.Context, id primitive.ObjectID) (*entities.Page, error) {
+	reports := []*entities.LFIReport{}
+	err := s.rp.FindAllByPrimitiveM(primitive.M{"report_number": id}, &reports)
+	if err != nil {
+		return nil, err
+	}
+	return BuildPageInfomation(reports), nil
 }

@@ -3,6 +3,8 @@ package entities
 import (
 	"auditor/core/mongodb"
 	"net/url"
+
+	"go.mongodb.org/mongo-driver/bson/primitive"
 )
 
 type SQLi struct {
@@ -25,9 +27,10 @@ type SQLi struct {
 
 type SQLiReport struct {
 	mongodb.Model  `bson:",inline"`
-	Location       string        `json:"location,omitempty"`
-	Payload        []string      `json:"payload,omitempty"`
-	Level          LEVEL         `json:"level,omitempty"`
-	Type           TYPE          `json:"type,omitempty"`
-	Vaulnerability VULNERABILITY `json:"vaulnerability,omitempty"`
+	Location       string             `json:"location,omitempty" bson:"location"`
+	Payload        []string           `json:"payload,omitempty" bson:"payload"`
+	Level          LEVEL              `json:"level,omitempty" bson:"level"`
+	Type           TYPE               `json:"type,omitempty" bson:""`
+	Vaulnerability VULNERABILITY      `json:"vaulnerability,omitempty" bson:"vaulnerability"`
+	ReportNumber   primitive.ObjectID `json:"report_number,omitempty" bson:"report_number"`
 }

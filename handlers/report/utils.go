@@ -18,9 +18,10 @@ import (
 	"net/http"
 
 	"github.com/jinzhu/copier"
+	"go.mongodb.org/mongo-driver/bson/primitive"
 )
 
-func (s Service) doMissConfig(c *context.Context, option *Form) *entities.Page {
+func (s Service) doMissConfig(c *context.Context, option *Form) []*entities.MissConfigurationReport {
 	f := &mc.MCForm{}
 	_ = copier.Copy(f, option)
 
@@ -29,10 +30,10 @@ func (s Service) doMissConfig(c *context.Context, option *Form) *entities.Page {
 		return nil
 	}
 
-	return report.(*entities.Page)
+	return report
 }
 
-func (s Service) doCryptoFailure(c *context.Context, option *Form) *entities.Page {
+func (s Service) doCryptoFailure(c *context.Context, option *Form) []*entities.CryptoFailureReport {
 	f := &cf.CFForm{}
 	_ = copier.Copy(f, option)
 
@@ -41,15 +42,16 @@ func (s Service) doCryptoFailure(c *context.Context, option *Form) *entities.Pag
 		return nil
 	}
 
-	return report.(*entities.Page)
+	return report
 }
 
-func (s Service) doOutdatedCpn(c *context.Context, ref []*entities.MissConfigurationReport) *entities.Page {
+func (s Service) doOutdatedCpn(c *context.Context, ref []*entities.MissConfigurationReport, id primitive.ObjectID) []*entities.OutdatedComponentsReport {
 	if len(ref) <= 0 {
 		return nil
 	}
 
 	f := &odc.OutdatedComponentForm{}
+	f.ReportNumber = id
 	for _, r := range ref {
 		if len(r.Payload) == 0 {
 			continue
@@ -64,10 +66,10 @@ func (s Service) doOutdatedCpn(c *context.Context, ref []*entities.MissConfigura
 		return nil
 	}
 
-	return report.(*entities.Page)
+	return report
 }
 
-func (s Service) doXSS(c *context.Context, option *Form) *entities.Page {
+func (s Service) doXSS(c *context.Context, option *Form) []*entities.XSSReport {
 	f := &xss.XSSForm{}
 	_ = copier.Copy(f, option)
 
@@ -76,22 +78,22 @@ func (s Service) doXSS(c *context.Context, option *Form) *entities.Page {
 		return nil
 	}
 
-	return report.(*entities.Page)
+	return report
 }
 
-func (s Service) doSQLI(c *context.Context, option *Form) *entities.Page {
+func (s Service) doSQLI(c *context.Context, option *Form) interface{} {
 	f := &sqli.SqliForm{}
 	_ = copier.Copy(f, option)
 
-	report, err := s.sqlis.Init(c, f)
+	reports, err := s.sqlis.Init(c, f)
 	if err != nil {
 		return nil
 	}
 
-	return report.(*entities.Page)
+	return reports
 }
 
-func (s Service) doLFI(c *context.Context, option *Form) *entities.Page {
+func (s Service) doLFI(c *context.Context, option *Form) []*entities.LFIReport {
 	f := &lfi.LFIForm{}
 	_ = copier.Copy(f, option)
 
@@ -100,7 +102,7 @@ func (s Service) doLFI(c *context.Context, option *Form) *entities.Page {
 		return nil
 	}
 
-	return report.(*entities.Page)
+	return report
 }
 
 func injectPayload(option entities.LFI, payload string) string {

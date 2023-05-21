@@ -8,7 +8,7 @@ import (
 	"strings"
 )
 
-func buildPageInfomation(e []*entities.SQLiReport) *entities.Page {
+func BuildPageInfomation(e []*entities.SQLiReport) *entities.Page {
 	if len(e) <= 0 {
 		return nil
 	}

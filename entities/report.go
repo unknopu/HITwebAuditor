@@ -14,13 +14,14 @@ type ReportBase struct {
 }
 
 type Report struct {
-	URL               string `json:"url"`
-	SQLi              *Page  `json:"sqli,omitempty"`
-	LFI               *Page  `json:"lfi,omitempty"`
-	MConfig           *Page  `json:"miss_config,omitempty"`
-	XSS               *Page  `json:"xss,omitempty"`
-	CryptoFailure     *Page  `json:"crypto_failure,omitempty"`
-	OutdatedComponent *Page  `json:"outdated_component,omitempty"`
+	mongodb.Model     `bson:",inline"`
+	URL               string `json:"url" bson:"url,omitempty"`
+	SQLi              *Page  `json:"sqli,omitempty" bson:"sqli,omitempty"`
+	LFI               *Page  `json:"lfi,omitempty" bson:"lfi,omitempty"`
+	MConfig           *Page  `json:"miss_config,omitempty" bson:"miss_config,omitempty"`
+	XSS               *Page  `json:"xss,omitempty" bson:"xss,omitempty"`
+	CryptoFailure     *Page  `json:"crypto_failure,omitempty" bson:"crypto_failure,omitempty"`
+	OutdatedComponent *Page  `json:"outdated_component,omitempty" bson:"outdated_component,omitempty"`
 }
 
 // MarshalJSON custom image json

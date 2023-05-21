@@ -8,6 +8,8 @@ import (
 	"log"
 	"strings"
 	"sync"
+
+	"go.mongodb.org/mongo-driver/bson/primitive"
 )
 
 var (
@@ -17,7 +19,8 @@ var (
 
 // ServiceInterface service interface
 type ServiceInterface interface {
-	Init(c *context.Context, f *XSSForm) (interface{}, error)
+	Init(c *context.Context, f *XSSForm) ([]*entities.XSSReport, error)
+	FetchReport(c *context.Context, id primitive.ObjectID) (*entities.Page, error)
 }
 
 // Service  repo
@@ -34,7 +37,7 @@ func NewService(c *app.Context) ServiceInterface {
 	}
 }
 
-func (s *Service) Init(c *context.Context, f *XSSForm) (interface{}, error) {
+func (s *Service) Init(c *context.Context, f *XSSForm) ([]*entities.XSSReport, error) {
 	option := f.URLOptions()
 
 	var reports []*entities.XSSReport
@@ -58,7 +61,7 @@ func (s *Service) Init(c *context.Context, f *XSSForm) (interface{}, error) {
 			p = append(p, payload)
 			payloadSpliter = payload[0:4]
 		}
-		if len(p) > 3 {
+		if len(p) > 2 {
 			break
 		}
 	}
@@ -73,5 +76,23 @@ func (s *Service) Init(c *context.Context, f *XSSForm) (interface{}, error) {
 		})
 	}
 
-	return buildPageInfomation(reports), nil
+	for index, _ := range reports {
+		reports[index].ReportNumber = f.ReportNumber
+	}
+
+	err := s.rp.Create(reports)
+	if err != nil {
+		return nil, err
+	}
+
+	return reports, nil
+}
+
+func (s *Service) FetchReport(c *context.Context, id primitive.ObjectID) (*entities.Page, error) {
+	reports := []*entities.XSSReport{}
+	err := s.rp.FindAllByPrimitiveM(primitive.M{"report_number": id}, &reports)
+	if err != nil {
+		return nil, err
+	}
+	return BuildPageInfomation(reports), nil
 }

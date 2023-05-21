@@ -41,7 +41,7 @@ type Options struct {
 
 // InitDatabase new database
 func InitDatabase(o *Options) error {
-	ctx, concel := context.WithTimeout(context.Background(), 10*time.Second)
+	ctx, concel := context.WithTimeout(context.Background(), 30*time.Second)
 	defer concel()
 
 	uri := fmt.Sprintf("mongodb://%s:%d", o.URL, o.Port)
