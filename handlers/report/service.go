@@ -63,8 +63,6 @@ func (s *Service) Init(c *context.Context, f *Form) (interface{}, error) {
 	}
 	f.ReportNumber = *report.ID
 
-	// option := f.URLOptions()
-	// var missConfigVul, outdatedCpnVul, cryptoFailureVul, xssVul, lfiVul, sqliVul *entities.Page
 	wg.Add(5)
 
 	go func() {
@@ -91,28 +89,6 @@ func (s *Service) Init(c *context.Context, f *Form) (interface{}, error) {
 		wg.Done()
 	}()
 	wg.Wait()
-
-	// report := &entities.Report{
-	// 	URL:               f.URL,
-	// 	MConfig:           missConfigVul,
-	// 	CryptoFailure:     cryptoFailureVul,
-	// 	OutdatedComponent: outdatedCpnVul,
-	// 	XSS:               xssVul,
-	// 	LFI:               lfiVul,
-	// 	SQLi:              sqliVul,
-	// }
-
-	// _ = s.doSQLI(c, f)
-	// smf := s.doMissConfig(c, f)
-	// _ = s.doOutdatedCpn(c, smf, f.ReportNumber)
-	// _ = s.doXSS(c, f)
-	// _ = s.doCryptoFailure(c, f)
-	// _ = s.doLFI(c, f)
-
-	// report := &entities.Report{
-	// 	URL:  f.URL,
-	// 	SQLi: sqliVul,
-	// }
 
 	return nil, nil
 }

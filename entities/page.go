@@ -8,11 +8,11 @@ type PageInformation struct {
 	High               int  `json:"total_number_of_high"`
 	Critical           int  `json:"total_number_of_critical"`
 	RiskRate           int  `json:"risk_rate"`
-	Injection          *int `json:"type_injection,omitempty"`
-	Broken             *int `json:"type_broken_access_control,omitempty"`
-	Cryptography       *int `json:"type_crypto_failure,omitempty"`
-	MisConfiguration   *int `json:"type_miss_configuration,omitempty"`
-	OutdatedComponents *int `json:"type_outdated_components,omitempty"`
+	Injection          *int `json:"type_injection"`
+	Broken             *int `json:"type_broken_access_control"`
+	Cryptography       *int `json:"type_crypto_failure"`
+	MisConfiguration   *int `json:"type_miss_configuration"`
+	OutdatedComponents *int `json:"type_outdated_components"`
 }
 
 // Page page model
