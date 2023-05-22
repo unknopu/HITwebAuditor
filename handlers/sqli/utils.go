@@ -67,8 +67,8 @@ func isContainBooleanBased(option entities.SQLi) bool {
 		u.RawQuery = q.Encode()
 		body := utils.GetPageHTML(u.String(), option.Cookie)
 
-		if !detectErrMsg(body) {
-			return strings.Contains(body, `<body>`)
+		if option.PageLength == len(body) && !detectErrMsg(body) {
+			return true
 		}
 	}
 

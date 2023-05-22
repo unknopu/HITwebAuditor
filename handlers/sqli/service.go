@@ -81,14 +81,14 @@ func (s *Service) Init(c *context.Context, f *SqliForm) ([]*entities.SQLiReport,
 	}()
 	wg.Wait()
 
-	for index, _ := range reports {
-		reports[index].ReportNumber = f.ReportNumber
-	}
+	// for index, _ := range reports {
+	// 	reports[index].ReportNumber = f.ReportNumber
+	// }
 
-	err := s.rp.Create(reports)
-	if err != nil {
-		return nil, err
-	}
+	// err := s.rp.Create(reports)
+	// if err != nil {
+	// 	return nil, err
+	// }
 	return reports, nil
 }
 

