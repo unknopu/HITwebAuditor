@@ -8,7 +8,7 @@ import (
 )
 
 const (
-	collectionName = "lfi"
+	collectionName = "xss"
 )
 
 // RepoInterface repo interface

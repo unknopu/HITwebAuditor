@@ -72,17 +72,6 @@ func (s *Service) Init(c *context.Context, f *LFIForm) ([]*entities.LFIReport, e
 	if err != nil {
 		return nil, err
 	}
-
-	log.Println()
-	log.Println(len(reports))
-	log.Println(len(reports))
-	log.Println(len(reports))
-	log.Println(len(reports))
-	log.Println(len(reports))
-	log.Println(len(reports))
-	log.Println(len(reports))
-	log.Println()
-
 	return reports, nil
 }
 
