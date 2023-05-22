@@ -43,8 +43,7 @@ func (i Report) MarshalJSON() ([]byte, error) {
 		medium += m.SQLi.PageInformation.Medium
 		high += m.SQLi.PageInformation.High
 		critical += m.SQLi.PageInformation.Critical
-		n := len(m.SQLi.Entities.([]*SQLiReport))
-		m.PageInformation.Injection = &n
+		m.PageInformation.Injection = len(m.SQLi.Entities.([]*SQLiReport))
 	}
 
 	if m.LFI != nil {
@@ -55,8 +54,7 @@ func (i Report) MarshalJSON() ([]byte, error) {
 		medium += m.LFI.PageInformation.Medium
 		high += m.LFI.PageInformation.High
 		critical += m.LFI.PageInformation.Critical
-		n := len(m.LFI.Entities.([]*LFIReport))
-		m.PageInformation.Broken = &n
+		m.PageInformation.Broken = len(m.LFI.Entities.([]*LFIReport))
 	}
 
 	if m.MConfig != nil {
@@ -67,8 +65,7 @@ func (i Report) MarshalJSON() ([]byte, error) {
 		medium += m.MConfig.PageInformation.Medium
 		high += m.MConfig.PageInformation.High
 		critical += m.MConfig.PageInformation.Critical
-		n := len(m.MConfig.Entities.([]*MissConfigurationReport))
-		m.PageInformation.MisConfiguration = &n
+		m.PageInformation.MisConfiguration = len(m.MConfig.Entities.([]*MissConfigurationReport))
 	}
 
 	if m.XSS != nil {
@@ -79,8 +76,7 @@ func (i Report) MarshalJSON() ([]byte, error) {
 		medium += m.XSS.PageInformation.Medium
 		high += m.XSS.PageInformation.High
 		critical += m.XSS.PageInformation.Critical
-		n := len(m.XSS.Entities.([]*XSSReport))
-		m.PageInformation.Injection = &n
+		m.PageInformation.Injection = len(m.XSS.Entities.([]*XSSReport))
 	}
 
 	if m.CryptoFailure != nil {
@@ -91,8 +87,7 @@ func (i Report) MarshalJSON() ([]byte, error) {
 		medium += m.CryptoFailure.PageInformation.Medium
 		high += m.CryptoFailure.PageInformation.High
 		critical += m.CryptoFailure.PageInformation.Critical
-		n := len(m.CryptoFailure.Entities.([]*CryptoFailureReport))
-		m.PageInformation.Cryptography = &n
+		m.PageInformation.Cryptography = len(m.CryptoFailure.Entities.([]*CryptoFailureReport))
 	}
 
 	if m.OutdatedComponent != nil {
@@ -103,8 +98,7 @@ func (i Report) MarshalJSON() ([]byte, error) {
 		medium += m.OutdatedComponent.PageInformation.Medium
 		high += m.OutdatedComponent.PageInformation.High
 		critical += m.OutdatedComponent.PageInformation.Critical
-		n := len(m.OutdatedComponent.Entities.([]*OutdatedComponentsReport))
-		m.PageInformation.OutdatedComponents = &n
+		m.PageInformation.OutdatedComponents = len(m.OutdatedComponent.Entities.([]*OutdatedComponentsReport))
 	}
 
 	m.PageInformation.Vulnerabilities = vulnerabilities
@@ -121,10 +115,9 @@ func (i Report) MarshalJSON() ([]byte, error) {
 }
 
 func VulnerabilitiesCounter(pageInfo *PageInformation) {
-	zero := 0
-	pageInfo.Injection = &zero
-	pageInfo.Broken = &zero
-	pageInfo.Cryptography = &zero
-	pageInfo.MisConfiguration = &zero
-	pageInfo.OutdatedComponents = &zero
+	pageInfo.Injection = 0
+	pageInfo.Broken = 0
+	pageInfo.Cryptography = 0
+	pageInfo.MisConfiguration = 0
+	pageInfo.OutdatedComponents = 0
 }
