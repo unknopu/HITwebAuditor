@@ -132,6 +132,7 @@ func NewWithOptions(options *Options, context *app.Context) *echo.Echo {
 	{
 		ReportGroup.POST("", ReportHandler.Init)
 		ReportGroup.GET("/latest", ReportHandler.GetLatest)
+		ReportGroup.GET("/history", ReportHandler.GetHistory)
 	}
 
 	StaticAnalysisGroup := api.Group("/sa")

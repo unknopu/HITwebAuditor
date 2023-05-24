@@ -10,10 +10,12 @@ import (
 	odc "auditor/handlers/outdated_component"
 	sqli "auditor/handlers/sqli"
 	xss "auditor/handlers/xss"
+	"errors"
 	"log"
 	"sync"
+	"time"
 
-	"github.com/go-redis/redis/v8"
+	"github.com/patrickmn/go-cache"
 )
 
 var (
@@ -25,6 +27,9 @@ var (
 type ServiceInterface interface {
 	Init(c *context.Context, f *Form) (interface{}, error)
 	GetLatest(c *context.Context, f *GetLatestForm) (interface{}, error)
+	GetHistory(c *context.Context, f *GetLatestForm) (interface{}, error)
+
+	mapReports(c *context.Context, reports []*entities.Report)
 }
 
 // Service  repo
@@ -37,7 +42,7 @@ type Service struct {
 	xsss    xss.ServiceInterface
 	lfis    lfi.ServiceInterface
 	sqlis   sqli.ServiceInterface
-	cache   *redis.Client
+	cache   *cache.Cache
 }
 
 // NewService new service
@@ -51,11 +56,16 @@ func NewService(c *app.Context) ServiceInterface {
 		xsss:    xss.NewService(c),
 		lfis:    lfi.NewService(c),
 		sqlis:   sqli.NewService(c),
-		cache:   c.RedisClient,
+		cache:   cache.New(1*time.Minute, 3*time.Minute),
 	}
 }
 
 func (s *Service) Init(c *context.Context, f *Form) (interface{}, error) {
+	_, hit := s.cache.Get(f.URL)
+	if hit {
+		return nil, errors.New("url target is processing.")
+	}
+
 	report := &entities.Report{URL: f.URL}
 	err := s.rp.Create(report)
 	if err != nil {
@@ -90,29 +100,58 @@ func (s *Service) Init(c *context.Context, f *Form) (interface{}, error) {
 	}()
 	wg.Wait()
 
+	s.cache.Set(f.URL, nil, 5*time.Second)
 	return nil, nil
 }
 
 func (s *Service) GetLatest(c *context.Context, f *GetLatestForm) (interface{}, error) {
-
 	log.Println("init fetching... ")
 	report, err := s.rp.FindLatest()
 	if err != nil {
 		return nil, err
 	}
 
-	sqli := s.fetchSQLI(c, *report.ID)
-	secMissCon := s.fetchSecMissCon(c, *report.ID)
-	outDateComponents := s.fetchOutdatedCpn(c, *report.ID)
-	xss := s.fetchXSS(c, *report.ID)
-	cryptoFailure := s.fetchCryptoFailure(c, *report.ID)
-	lfi := s.fetchLFI(c, *report.ID)
+	cache, hit := s.cache.Get(report.ID.Hex())
+	if hit {
+		return cache.(*entities.Report), nil
+	}
 
-	report.SQLi = sqli
-	report.MConfig = secMissCon
-	report.OutdatedComponent = outDateComponents
-	report.XSS = xss
-	report.CryptoFailure = cryptoFailure
-	report.LFI = lfi
+	s.mapReports(c, []*entities.Report{report})
+	s.cache.Set(report.ID.Hex(), report, 5*time.Second)
+
 	return report, nil
+}
+func (s *Service) GetHistory(c *context.Context, f *GetLatestForm) (interface{}, error) {
+	reports, err := s.rp.FindHistory()
+	if err != nil {
+		return nil, err
+	}
+
+	cache, hit := s.cache.Get(c.Request().URL.String())
+	if hit {
+		return cache.([]*entities.Report), nil
+	}
+
+	s.mapReports(c, reports)
+	s.cache.Set(c.Request().URL.String(), reports, 35*time.Second)
+
+	return reports, nil
+}
+
+func (s *Service) mapReports(c *context.Context, reports []*entities.Report) {
+	for index, report := range reports {
+		sqli := s.fetchSQLI(c, *report.ID)
+		secMissCon := s.fetchSecMissCon(c, *report.ID)
+		outDateComponents := s.fetchOutdatedCpn(c, *report.ID)
+		xss := s.fetchXSS(c, *report.ID)
+		cryptoFailure := s.fetchCryptoFailure(c, *report.ID)
+		lfi := s.fetchLFI(c, *report.ID)
+
+		reports[index].SQLi = sqli
+		reports[index].MConfig = secMissCon
+		reports[index].OutdatedComponent = outDateComponents
+		reports[index].XSS = xss
+		reports[index].CryptoFailure = cryptoFailure
+		reports[index].LFI = lfi
+	}
 }
