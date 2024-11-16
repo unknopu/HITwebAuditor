@@ -1,21 +1,83 @@
-# Binaries for programs and plugins
-*.exe
-*.exe~
-*.dll
-*.so
-*.dylib
+user_variables
+support_tickets
+users
+columns_priv
+index_stats
+time_zone_name
+general_log
+proxies_priv
+time_zone_leap_second
+table_stats
+slow_log
+db
+roles_mapping
+procs_priv
+time_zone_transition
+time_zone
+help_keyword
+help_topic
+proc
+column_stats
+event
+plugin
+gtid_slave_pos
+func
+servers
+tables_priv
+transaction_registry
+help_relation
+time_zone_transition_type
+help_category
+global_priv
+user
+accounts
+cond_instances
+file_instances
+file_summary_by_event_name
+file_summary_by_instance
+global_status
+host_cache
+hosts
+memory_summary_by_account_by_event_name
+memory_summary_by_host_by_event_name
+memory_summary_by_thread_by_event_name
+memory_summary_by_user_by_event_name
+memory_summary_global_by_event_name
+metadata_locks
+mutex_instances
+objects_summary_global_by_type
+performance_timers
+prepared_statements_instances
+replication_applier_configuration
+replication_applier_status
+replication_applier_status_by_coordinator
+replication_connection_configuration
+rwlock_instances
+session_account_connect_attrs
+session_connect_attrs
+session_status
+setup_actors
+setup_consumers
+setup_instruments
+setup_objects
+setup_timers
+socket_instances
+socket_summary_by_event_name
+socket_summary_by_instance
+status_by_account
+status_by_host
+status_by_thread
+status_by_user
+table_handles
+table_io_waits_summary_by_index_usage
+table_io_waits_summary_by_table
+table_lock_waits_summary_by_table
+user_variables_by_thread
+users	
 
-# Test binary, build with `go test -c`
-*.test
 
-# VSCode
-# .vscode
-launch.json
-*debug*
 
-# Mac OSX
-.DS_Store
-.idea
 
-configs/
-config.yaml
+
+1adminPRMS{sq1_1nj3ct10n}
+administrator@admin.comadmin:,2adminPRMS{sq1_1nj3ct10n}administrator@admin.comadmin:,3adminPRMS{sq1_1nj3ct10n}administrator@admin.comadmin:,4adminPRMS{sq1_1nj3ct10n}administrator@admin.comadmin:,5adminPRMS{sq1_1nj3ct10n}administrator@admin.comadmin:,6adminPRMS{sq1_1nj3ct10n}administrator@admin.comadmin:,7adminPRMS{sq1_1nj3ct10n}administrator@admin.comadmin:,8test$2b$10$/BF/kK1qpiUqHOFFM75eBOPIAwVpijdTn1wcIGVi43d7S0n06g7J2test@gmail.comuser:,9ar3mus$2b$10$uRb4LxVjxqh5Z87YNPTJXO19Q4s/2FYc8M2xiWbBwav3rwuw7gB/2ar3mus@mail.comuser:,10pgoodboy$2b$10$GWi6yFzaQTllx84L4D23deTAVIL8Ayxh2suvud2WLR2o7Qn3CgsHmtest@test.gouser:,11tanklanthip$2b$10$QGrgCzdQaBQ.BtK9/jdqKebMHke4RTwFzNcD1Xib1vAGssfGUf7gmtanchanok.klanthip@gmail.comuser:,12admin02$2b$10$zJR/fLZg5eIXLuGchOBIN.ho23q15q5eJotEh/AyhS5GQUC.IAzAyadmin@gmail.comuser:,13yok12345$2b$10$QNojwji.2IiTzMVXFahd4OL8lY8peZuS9lCUy5GJ5LXFw.C67OA0qwongwarit.b@gmail.comuser:,14admin1$2b$10$aon0KsnigwbntWZshxV3F.bbFirEnj1prDGo/XC36xnE6/zT5hdiKadmin@admin.comuser:,15Ggasd$2b$10$UYfkyCtN4iushsG3OeXNXuEMEi4.teBLC0h5KcHUMAQSUlHRkLQZSggaq05@gmail.comuser:,16M3ez$2b$10$NChJhhrTAzTqc3X/OQqhSu5dZ/rL.WC7DrPTIe/hF4mrN02g0qop6m3ez.test.1@gmail.comuser:,17ajdiowq$2b$10$HX.cBcJOjJLrWkm8usRCLOUMGi68GWCdMObNQ8tFfnXPvQtj3LtyKpatrafulmi@gufum.comuser:,18foo$2b$10$bozRCEatdByP8IKVkqhCue8VHpBVvOPk9ylrPFDwiLSIPeH4WoR9Cfoo@bar.comuser:,19test123123$2b$10$fwNsHGBykenxLnHbG.AfOecVYJaihjBXSu30DIr48ItF2epxgQUxStest@gmail.comuser:,20test1234$2b$10$tHQqS/i44pFYFu2KijPnhuLfYLYwNREFFGYhDklat.YmEI/lK1bfCtest1234@gmail.comuser:,21bxdman$2b$10$FJGPyst9YJNBZh83QESIw./S1shYkUnkQ7mG3aRa/dVN5LGJQF1YCbxdman@isac.ac.tthuser:,22testtest$2b$10$iLBNgNqlsgUxg5G0imml.OKNXXnUmBxOqyprbKrsrKlVQWyDua38Otesttest@gmail.comuser:,23test2$2b$10$Jer0hT/LwLIh8E0ky25C4egHkkWwgd1Z/6xUabDL6RwPhJqAtuuAGtest2@gmail.comuser:,24eiei$2b$10$MKuybYy3rvZ9ydxz.9SNBO1hAdBqZDkipa4MKZnhwWofRT1MNOjf6eiei@gmail.comuser:,251111$2b$10$e2zQSr.9t3a9MvVPsxQ3HOiLHRf.MIma7QOt8FWvERI6eRDaR4Z6ikumuang666666@gmail.comuser:,26law$2b$10$QaJMC86LxOU.7OhjIHYA1OOdOcHB5.8ZNw0MfrmMx4sbJU/rpBjwiaaa@aaaa.aaauser:,27Hello$2b$10$z3wguQVJHL2qthruDVYzoePVBQx4.mh37Q5GYIeyUS4xVLTN3cdqutest@gmail.comuser:,281$2b$10$VlW/LOaOKIoNcYt9Ew0hdOuTNQK5StOrcGeyyPwMF90GtkzlhnRGiuu@hh.comuser:,29Tle$2b$10$AXofnh5AZnL6EX1aRPlfAuiVWKuiN06J9VQSKDVbu5QJWwM4mm6kOtt@hotmail.comuser:,30Hacker$2b$10$UeXl4L9z8Y04wtdfuyAGeORoYA4y66jTc1h6eeE2sFG0rpI0SSqfWhacker@gmail.comuser:,31P@ssw0rd$2b$10$sm.56w4mFIOqOqkXn3jI/uZQaP0mPhid02VrbIAoOfonJOFSxJOW6ciyoked247@opposir.comuser:,32god$2b$10$nEpSF6YmmptIsZEwIzn7jOFksMJVLqKeMiupwniXX6vAQnoVHZzsCgod@god.comuser:,33cat$2b$10$o9qqr3iEB5CYQzU9mfA7iu0pN5BUnjX4OsLZr74C9CisiR8WUdWh.cat@cat2.comuser:,34p3ngu1nb0y$2b$10$5psp5XdalnMiD6HGGTA8Wey3iQHpkwtegQLBeXmDT6Mas9WaXZMW6waroon.sang@outlook.comuser:	
