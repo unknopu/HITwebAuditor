@@ -1,16 +1,15 @@
-POST / HTTP/1.1
-Host: 34.142.201.28
+POST /login.php HTTP/1.1
+Host: 34.126.119.100
 User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:133.0) Gecko/20100101 Firefox/133.0
 Accept: text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8
 Accept-Language: en-GB,en;q=0.5
 Accept-Encoding: gzip, deflate, br
 Content-Type: application/x-www-form-urlencoded
-Content-Length: 11
-Origin: http://34.142.201.28
+Content-Length: 32
+Origin: http://34.126.119.100
 Connection: keep-alive
-Referer: http://34.142.201.28/
-Cookie: PHPSESSID=7si4ubd8er4ajldaa9ol8al5c6
+Referer: http://34.126.119.100/
 Upgrade-Insecure-Requests: 1
 Priority: u=0, i
 
-bookID=test
+email=test&password=test&submit=
